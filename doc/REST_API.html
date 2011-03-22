@@ -1,0 +1,2359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<title>REST API</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<style>
+body { font:80% Verdana,Tahoma,Arial,sans-serif; }
+h1, h2, h3, h4 {  font-family: "Trebuchet MS",Georgia,"Times New Roman",serif; }
+ul.toc { padding: 4px; margin-left: 0; }
+ul.toc li { list-style-type:none; }
+ul.toc li.heading2 { margin-left: 1em; }
+ul.toc li.heading3 { margin-left: 2em; }
+a.wiki-anchor { display: none; margin-left: 6px; text-decoration: none; }
+a.wiki-anchor:hover { color: #aaa !important; text-decoration: none; }
+h1:hover a.wiki-anchor, h2:hover a.wiki-anchor, h3:hover a.wiki-anchor { display: inline; color: #ddd; }
+</style>
+</head>
+<body>
+<h1 id="REST-API">REST API<a href="#REST-API" class="wiki-anchor">&para;</a></h1>
+
+
+	<ul class="toc right"><li class="heading1"><a href="#REST-API">REST API</a></li>
+<li class="heading1"><a href="#Datasets-API">Datasets API</a></li>
+<li class="heading2"><a href="#Download-Dataset">*Download Dataset*</a></li>
+<li class="heading2"><a href="#Create-Dataset">*Create Dataset*</a></li>
+<li class="heading3"><a href="#Create-Dataset-by-Upload">*Create Dataset by Upload*</a></li>
+<li class="heading3"><a href="#Create-Dataset-from-URL">*Create Dataset from URL*</a></li>
+<li class="heading2"><a href="#Update-Dataset">*Update Dataset*</a></li>
+<li class="heading3"><a href="#Metadata-Dataset-Update">*Metadata Dataset Update*</a></li>
+<li class="heading2"><a href="#Update-Dataset-Feed">*Update Dataset Feed*</a></li>
+<li class="heading2"><a href="#Delete-Dataset">*Delete Dataset*</a></li>
+<li class="heading1"><a href="#Features-API">Features API</a></li>
+<li class="heading1"><a href="#Analysis-API-GeoIQ-Appliances-only">Analysis API (GeoIQ Appliances only)</a></li>
+<li class="heading2"><a href="#Analyze">*Analyze*</a></li>
+<li class="heading1"><a href="#Maps-API">Maps API</a></li>
+<li class="heading2"><a href="#Download-Map">*Download Map*</a></li>
+<li class="heading2"><a href="#Create-Map">*Create Map*</a></li>
+<li class="heading2"><a href="#Update-Map">*Update Map*</a></li>
+<li class="heading2"><a href="#Delete-Map">*Delete Map*</a></li>
+<li class="heading2"><a href="#Add-Layer-to-Map">*Add Layer to Map*</a></li>
+<li class="heading3"><a href="#Detailed-Map-Styling-Information">*Detailed Map Styling Information*</a></li>
+<li class="heading1"><a href="#Search-API">Search API</a></li>
+<li class="heading2"><a href="#Search">*Search*</a></li>
+<li class="heading1"><a href="#Groups-API-GeoIQ-Appliance-Feature-Only">Groups API (GeoIQ Appliance Feature Only)</a></li>
+<li class="heading2"><a href="#Create-Group">*Create Group*</a></li>
+<li class="heading2"><a href="#Add-User-to-Group">*Add User to Group*</a></li>
+<li class="heading2"><a href="#List-Group-Users">*List Group Users*</a></li>
+<li class="heading2"><a href="#Delete-Group">*Delete Group*</a></li>
+<li class="heading1"><a href="#Users-API">Users API</a></li>
+<li class="heading2"><a href="#Create-User">*Create User*</a></li>
+<li class="heading2"><a href="#Retrieve-User-Info">*Retrieve User Info*</a></li>
+<li class="heading2"><a href="#Modify-User">*Modify User*</a></li>
+</ul>
+
+
+	<p>The GeoIQ REST API has methods to perform all of the actions available in the GeoIQ GUI, but with greater granularity.  Create maps of any color scheme you desire, update datasets in real-time and set user permissions.  This is all accomplished through creates, reads, updates or deletes (CRUD) to various endpoints through HTTP methods.</p>
+
+
+	<h1 id="Datasets-API">Datasets API<a href="#Datasets-API" class="wiki-anchor">&para;</a></h1>
+
+
+	<p><strong>Endpoint:</strong> <a class="external" href="http://geocommons/datasets">http://geocommons/datasets</a></p>
+
+
+	<p><strong>Description:</strong> The datasets endpoint allows creation, modification, download and deletion of data in GeoIQ.  Methods for modifying and deleting datasets require basic authentication.  For reading of data it depends on the configuration of the GeoIQ instance for GeoCommons it is not required.</p>
+
+
+	<p><strong>HTTP Methods Available:</strong> GET, POST, PUT, DELETE</p>
+
+
+	<p><strong>URL Summary</strong></p>
+
+
+	<table>
+		<tr>
+			<td><strong>Task</strong></td>
+			<td><strong>URL</strong></td>
+			<td><strong>Formats</strong></td>
+			<td><strong>HTTP METHOD</strong></td>
+		</tr>
+		<tr>
+			<td>Download</td>
+			<td><a class="external" href="http://geocommons.com/datasets/{id}.{format">http://geocommons.com/datasets/{id}.{format</a>}</td>
+			<td>kml,csv,zip,atom,json,spatialite</td>
+			<td>GET</td>
+		</tr>
+		<tr>
+			<td>Create</td>
+			<td><a class="external" href="http://geocommons.com/datasets">http://geocommons.com/datasets</a></td>
+			<td>xml,json,atom</td>
+			<td>POST</td>
+		</tr>
+		<tr>
+			<td>Update</td>
+			<td><a class="external" href="http://geocommons.com/datasets/{id}.{format">http://geocommons.com/datasets/{id}.{format</a>}</td>
+			<td>json,atom</td>
+			<td>PUT</td>
+		</tr>
+		<tr>
+			<td>Update Feed</td>
+			<td><a class="external" href="http://geocommons.com/datasets/{id}/fetch.{format">http://geocommons.com/datasets/{id}/fetch.{format</a>}</td>
+			<td>json,xml,html</td>
+			<td>PUT</td>
+		</tr>
+		<tr>
+			<td>Delete</td>
+			<td><a class="external" href="http://geocommons.com/datasets/{id">http://geocommons.com/datasets/{id</a>}</td>
+			<td>json</td>
+			<td>DELETE</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><em>zip returns compressed folder with shapefile inside</em></p>
+
+
+	<h2 id="Download-Dataset"><strong>Download Dataset</strong><a href="#Download-Dataset" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Not required for GeoCommons datasets, GeoIQ appliance datasets depends on the permissions of the data</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters</strong>:</p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>include_attributes</td>
+			<td>include data_attributes in the output: 0 or 1 (default: 0 (false))</td>
+			<td>include_attributes=1</td>
+		</tr>
+		<tr>
+			<td>include_features</td>
+			<td>include features in the output</td>
+			<td>include_features=1</td>
+		</tr>
+		<tr>
+			<td>include_geometry</td>
+			<td>include feature geometries</td>
+			<td>include_geometry=1</td>
+		</tr>
+		<tr>
+			<td>hex_geometry</td>
+			<td>use Hex EWKB for geometries</td>
+			<td>hex_geometry=1</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><em>default is false for option parameters use 0 or 1 (0 is false)</em></p>
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>file</td>
+			<td>returns a file of the type requested</td>
+			<td><a class="external" href="http://geocommons.com/overlays/7294.kml">http://geocommons.com/overlays/7294.kml</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl http://geocommons.com/overlays/7294.csv</pre><br /><pre>curl http://geocommons.com/overlays/7294.json?include_attributes=1&#38;hex_geometry=1</pre>
+
+	<h2 id="Create-Dataset"><strong>Create Dataset</strong><a href="#Create-Dataset" class="wiki-anchor">&para;</a></h2>
+
+
+	<p>You can currently upload data using two methods: via files from your hard drive, or via a URL from the Internet.</p>
+
+
+	<h3 id="Create-Dataset-by-Upload"><strong>Create Dataset by Upload</strong><a href="#Create-Dataset-by-Upload" class="wiki-anchor">&para;</a></h3>
+
+
+	<p><strong>Required Parameters Upload:</strong> (none)</p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>dataset[shp]</td>
+			<td>Name of your file(s) you are uploading</td>
+			<td>dataset[shp]=@elect_precincts.shp;</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><em>shp files require shp/shx/dbf files</em></p>
+
+
+	<p><strong>Optional Parameters</strong>:</p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>title</td>
+			<td>name of dataset</td>
+			<td>Unemployment in the USA 2010</td>
+		</tr>
+		<tr>
+			<td>description</td>
+			<td>description of what the dataset is</td>
+			<td>This dataset shows the increase in unemployment in the USA between 2009-2010</td>
+		</tr>
+		<tr>
+			<td>author</td>
+			<td>who created the dataset</td>
+			<td>Bureau of Labor Statistics</td>
+		</tr>
+		<tr>
+			<td>tags</td>
+			<td>words that describe the dataset and relate it to others</td>
+			<td>unemployment,labor,workforce</td>
+		</tr>
+		<tr>
+			<td>metadata_url</td>
+			<td>link to url containing metadata</td>
+			<td><a class="external" href="http://www.example.com">http://www.example.com</a></td>
+		</tr>
+		<tr>
+			<td>citation_url</td>
+			<td>link to the organization the data is from</td>
+			<td><a class="external" href="http://www.exampleorg.com">http://www.exampleorg.com</a></td>
+		</tr>
+		<tr>
+			<td>contact_name</td>
+			<td>person to contact about the data</td>
+			<td>John Doe</td>
+		</tr>
+		<tr>
+			<td>contact_address</td>
+			<td>address of the organization the data is from</td>
+			<td>123 Main Street, Somewhere VA</td>
+		</tr>
+		<tr>
+			<td>contact_phone</td>
+			<td>phone number of organization creating the data</td>
+			<td>555-555-5555</td>
+		</tr>
+		<tr>
+			<td>process_notes</td>
+			<td>additional notes about how you created the dataset</td>
+			<td>Ran data through Google Refine to remove duplicates before uploading</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>Location</td>
+			<td>returns the URI of the file requested</td>
+			<td><a class="external" href="http://geocommons.com/overlays/7294.json">http://geocommons.com/overlays/7294.json</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+	<p>Download sample data for examples from here:</p>
+
+
+<pre>curl -i -X POST -u "username:password" -F "dataset[dbf]=@sample_file.dbf;" -F "dataset[shp]=@sample_file.shp" -F "dataset[shx]=@sample_file.shx;" http://geocommons.com/datasets.json
+</pre><br /><pre>cat 98633.csv | curl -i -X POST -u "username:password" --data-binary @- -H "Content-Type: text/csv" http://geocommons.com/datasets.json
+</pre>
+
+	<h3 id="Create-Dataset-from-URL"><strong>Create Dataset from URL</strong><a href="#Create-Dataset-from-URL" class="wiki-anchor">&para;</a></h3>
+
+
+	<p>URL's can only be registered once in GeoIQ. So if the URL has already been registered by a user, you will receive a redirect to this existing dataset. You can make a copy of that dataset if you want to modify the metadata.</p>
+
+
+	<p><strong>Required Parameters Upload:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>url</td>
+			<td>url linking to the data feed</td>
+			<td><a class="external" href="http://api.flickr.com/services/feeds/geo/?tags=glitter&#38;lang=en-us&#38;format=kml_nl">http://api.flickr.com/services/feeds/geo/?tags=glitter&#38;lang=en-us&#38;format=kml_nl</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Optional Parameters</strong>:</p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>type</td>
+			<td>type of file being uploaded</td>
+			<td>csv,kml,atom</td>
+		</tr>
+		<tr>
+			<td>title</td>
+			<td>name of dataset</td>
+			<td>Unemployment in the USA 2010</td>
+		</tr>
+		<tr>
+			<td>description</td>
+			<td>description of what the dataset is</td>
+			<td>This dataset shows the increase in unemployment in the USA between 2009-2010</td>
+		</tr>
+		<tr>
+			<td>author</td>
+			<td>who created the dataset</td>
+			<td>Bureau of Labor Statistics</td>
+		</tr>
+		<tr>
+			<td>tags</td>
+			<td>words that describe the dataset and relate it to others</td>
+			<td>unemployment,labor,workforce</td>
+		</tr>
+		<tr>
+			<td>metadata_url</td>
+			<td>link to url containing metadata</td>
+			<td><a class="external" href="http://www.example.com">http://www.example.com</a></td>
+		</tr>
+		<tr>
+			<td>citation_url</td>
+			<td>link to the organization the data is from</td>
+			<td><a class="external" href="http://www.exampleorg.com">http://www.exampleorg.com</a></td>
+		</tr>
+		<tr>
+			<td>contact_name</td>
+			<td>person to contact about the data</td>
+			<td>John Doe</td>
+		</tr>
+		<tr>
+			<td>contact_address</td>
+			<td>address of the organization the data is from</td>
+			<td>123 Main Street, Somewhere VA</td>
+		</tr>
+		<tr>
+			<td>contact_phone</td>
+			<td>phone number of organization creating the data</td>
+			<td>555-555-5555</td>
+		</tr>
+		<tr>
+			<td>process_notes</td>
+			<td>additional notes about how you created the dataset</td>
+			<td>Ran data through Google Refine to remove duplicates before uploading</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><em>default is false for option parameters use 0 or 1 (0 is false)</em></p>
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>Location</td>
+			<td>returns the URI of the file requested</td>
+			<td><a class="external" href="http://geocommons.com/overlays/7294.json">http://geocommons.com/overlays/7294.json</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -X POST -u "user:password" -d "url=http://api.flickr.com/services/feedsgeo/?tags=glitter&#38;lang=en-us&#38;format=kml_nl" http://geocommons.com/datasets.xml
+</pre>
+
+	<h2 id="Update-Dataset"><strong>Update Dataset</strong><a href="#Update-Dataset" class="wiki-anchor">&para;</a></h2>
+
+
+	<p>Allows you to update the contents of the metadata for a dataset and define attributes types</p>
+
+
+	<h3 id="Metadata-Dataset-Update"><strong>Metadata Dataset Update</strong><a href="#Metadata-Dataset-Update" class="wiki-anchor">&para;</a></h3>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Requires basic authentication for both GeoCommons and GeoIQ appliances.</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters</strong>:</p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>type</td>
+			<td>type of file being uploaded</td>
+			<td>csv,kml,atom</td>
+		</tr>
+		<tr>
+			<td>title</td>
+			<td>name of dataset</td>
+			<td>Unemployment in the USA 2010</td>
+		</tr>
+		<tr>
+			<td>description</td>
+			<td>description of what the dataset is</td>
+			<td>This dataset shows the increase in unemployment in the USA between 2009-2010</td>
+		</tr>
+		<tr>
+			<td>author</td>
+			<td>who created the dataset</td>
+			<td>Bureau of Labor Statistics</td>
+		</tr>
+		<tr>
+			<td>tags</td>
+			<td>words that describe the dataset and relate it to others</td>
+			<td>unemployment,labor,workforce</td>
+		</tr>
+		<tr>
+			<td>metadata_url</td>
+			<td>link to url containing metadata</td>
+			<td><a class="external" href="http://www.example.com">http://www.example.com</a></td>
+		</tr>
+		<tr>
+			<td>citation_url</td>
+			<td>link to the organization the data is from</td>
+			<td><a class="external" href="http://www.exampleorg.com">http://www.exampleorg.com</a></td>
+		</tr>
+		<tr>
+			<td>contact_name</td>
+			<td>person to contact about the data</td>
+			<td>John Doe</td>
+		</tr>
+		<tr>
+			<td>contact_address</td>
+			<td>address of the organization the data is from</td>
+			<td>123 Main Street, Somewhere VA</td>
+		</tr>
+		<tr>
+			<td>contact_phone</td>
+			<td>phone number of organization creating the data</td>
+			<td>555-555-5555</td>
+		</tr>
+		<tr>
+			<td>process_notes</td>
+			<td>additional notes about how you created the dataset</td>
+			<td>Ran data through Google Refine to remove duplicates before uploading</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>HTTP Response</td>
+			<td>returns response indicating success or failure</td>
+			<td>201 Created</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -X PUT -u "username:password" http://geocommons.com/datasets/98735.json?title=changing%20title</pre>
+
+	<h2 id="Update-Dataset-Feed"><strong>Update Dataset Feed</strong><a href="#Update-Dataset-Feed" class="wiki-anchor">&para;</a></h2>
+
+
+	<p>It is possible to ping GeoIQ when new updates are available.</p>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Requires basic authentication for both GeoCommons and GeoIQ appliances.  The user must be either the owner or an authorized user with edit access.</p>
+
+
+	<h2 id="Delete-Dataset"><strong>Delete Dataset</strong><a href="#Delete-Dataset" class="wiki-anchor">&para;</a></h2>
+
+
+	<p>You can currently Delete datasets by sending a DELETE HTTP request to the dataset endpoint. Deleted datasets are not recoverable.</p>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for all delete requests.</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters</strong>:  (none)</p>
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>HTTP Response</td>
+			<td>returns a HTTP response 202 Accepted</td>
+			<td>HTTP/1.1 202 Accepted</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -X GET -u "user:password" http://geocommons.com/datasets/98737/fetch.json</pre>
+
+	<h1 id="Features-API">Features API<a href="#Features-API" class="wiki-anchor">&para;</a></h1>
+
+
+	<p><strong>Endpoint:</strong> <a class="external" href="http://geocommons.com/datasets/:id/features.{format">http://geocommons.com/datasets/:id/features.{format</a>}</p>
+
+
+	<p><strong>Description:</strong> The features API allows you to retrieve all or a portion of features in a given dataset.</p>
+
+
+	<p><strong>HTTP Methods Available:</strong> GET</p>
+
+
+	<p><strong>URL Summary:</strong></p>
+
+
+	<table>
+		<tr>
+			<td><strong>Task</strong></td>
+			<td><strong>URL</strong></td>
+			<td><strong>Formats</strong></td>
+			<td><strong>HTTP METHOD</strong></td>
+		</tr>
+		<tr>
+			<td>Filter</td>
+			<td><a class="external" href="http://geocommons.com/datasets/{id}/features.{format">http://geocommons.com/datasets/{id}/features.{format</a>}</td>
+			<td>json</td>
+			<td>GET</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Not required for GeoCommons datasets, GeoIQ appliance datasets depends on the permissions of the data</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters</strong>:</p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>limit</td>
+			<td>number of features to return (default is 30)</td>
+			<td>limit=2</td>
+		</tr>
+		<tr>
+			<td>order</td>
+			<td>'ascending' or 'descending' of the sort attribute (default ascending)</td>
+			<td>order=descending</td>
+		</tr>
+		<tr>
+			<td>start</td>
+			<td>index to start with. 1 would be the first. Allows paginating through data</td>
+			<td>start=6</td>
+		</tr>
+		<tr>
+			<td>json callback</td>
+			<td>callback method to wrap the response in</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>bbox</td>
+			<td>West/South/East/West is the order of the bounding box to get the features contained within an area</td>
+			<td>bbox=-79.5,20,-78,50</td>
+		</tr>
+		<tr>
+			<td>units</td>
+			<td>sets the unit for the radius parameter by default is km (requires radius parameter)</td>
+			<td>units=ft</td>
+		</tr>
+		<tr>
+			<td>lon</td>
+			<td>longitude of a point being searched from requires use of radius and lat parameters additionally</td>
+			<td>lon=-77.9998</td>
+		</tr>
+		<tr>
+			<td>lat</td>
+			<td>latitude of a point being search from requires use of the radius and lon parameters additionally</td>
+			<td>lat=39.8282</td>
+		</tr>
+		<tr>
+			<td>radius</td>
+			<td>defines distanced to be search from of a polygon,line,points or lat/lon pair (default is km)</td>
+			<td>radius=100</td>
+		</tr>
+		<tr>
+			<td>intersect</td>
+			<td>by default is set to contained which means only polygons fully inside the buffer will be returned,full means any part touching</td>
+			<td>intersect=full</td>
+		</tr>
+		<tr>
+			<td>with_columns</td>
+			<td>returns an additional attribute of an array of the column names of the dataset</td>
+			<td>with_columns=1</td>
+		</tr>
+		<tr>
+			<td>filter</td>
+			<td>filter parameters for specific attributes within the dataset</td>
+			<td></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl http://geocommons.com/datasets/98696/features.json?bbox=-79.5,20,-78,50</pre><br /><pre>curl http://geocommons.com/datasets/98696/features.json?lat=39.2&#38;lon=-77.1&#38;radius=100</pre><br /><pre>curl http://geocommons.com/datasets/98696/features.json?points=-77.1,39.8,-77.2,39.9,-77.3,39.99,-77.1,39.8&#38;radius=100</pre><br /><pre>curl http://geocommons.com/datasets/98696/features.json?polygon=-77,34,-78.5,34.5,-82,32,-79,30,-77,34&#38;radius=100</pre><br /><pre>curl http://geocommons.com/datasets/98696/features.json?line=-77,34,-78.5,34.5,-82,32,-79,30&#38;radius=100</pre><br /><pre>curl http://geocommons.com/datasets/98696/features.json?with_columns=1</pre><br /><pre>curl http://geocommons.com/datasets/22146/features.json?lat=38.8&#38;lon=-78.9&#38;radius=2&#38;intersect=full</pre><br /><pre>curl http://geocommons.com/datasets/98696/features.json?filter[int_col][][equals]=1&#38;filter[dec_col][][max]=.22</pre>
+
+	<p><strong>Filter Parameters</strong>:</p>
+
+
+	<p>Datasets can be filtered when requested from the server. This is done by calling the dataset/:id/features/ with the optional filter= paramter. The filter parameter can include a filter for any attribute name, and an array of filter conditions. Filter names must be URI encoded.</p>
+
+
+	<table>
+		<tr>
+			<td>Parameters</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>min</td>
+			<td>the minimum value of the attribute</td>
+			<td>filter[financing_amt][][min]=100</td>
+		</tr>
+		<tr>
+			<td>max</td>
+			<td>the maximum value of the attribute</td>
+			<td>filter[financing_amt][][max]=120</td>
+		</tr>
+		<tr>
+			<td>equals</td>
+			<td>the value the attribute must be equal to</td>
+			<td>filter[name][][equals]=bob</td>
+		</tr>
+	</table>
+
+
+
+
+<pre>http://geocommons.com/datasets/98696/features.json?filter[int_col][][max]=5&#38;filter[name][][equals]=point%201</pre><br /><pre>http://geocommons.com/datasets/98696/features.json?filter[int_col][][max]=5&#38;filter[int_col][][min]=3</pre>
+
+	<h1 id="Analysis-API-GeoIQ-Appliances-only">Analysis API (GeoIQ Appliances only)<a href="#Analysis-API-GeoIQ-Appliances-only" class="wiki-anchor">&para;</a></h1>
+
+
+	<p><a class="external" href="http://dev.fortiusone.com/projects/geocommons/wiki/Analysis_API">http://dev.fortiusone.com/projects/geocommons/wiki/Analysis_API</a></p>
+
+
+	<p><strong>Endpoint:</strong> <a class="external" href="http://geocommons.com/datasets/:id/calculate.:format">http://geocommons.com/datasets/:id/calculate.:format</a></p>
+
+
+	<p><strong>Description:</strong> GeoIQ is making a variety of analysis modules available including aggregation.  Through the analysis API you can run operations on a dataset to create a new resulting dataset.</p>
+
+
+	<p><strong>HTTP Methods Available:</strong> POST</p>
+
+
+	<p><strong>URL Summary:</strong></p>
+
+
+	<table>
+		<tr>
+			<td><strong>Task</strong></td>
+			<td><strong>URL</strong></td>
+			<td><strong>Formats</strong></td>
+			<td><strong>HTTP METHOD</strong></td>
+		</tr>
+		<tr>
+			<td>Analyze</td>
+			<td><a class="external" href="http://geocommons.com/datasets/:id/calculate.:format">http://geocommons.com/datasets/:id/calculate.:format</a></td>
+			<td>json</td>
+			<td>POST</td>
+		</tr>
+	</table>
+
+
+
+
+	<h2 id="Analyze"><strong>Analyze</strong><a href="#Analyze" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Required Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>alogrithm</td>
+			<td>the algorithm for the analysis</td>
+			<td>algorithm=aggregation</td>
+		</tr>
+		<tr>
+			<td>input</td>
+			<td>the inputs required to run the particular analysis</td>
+			<td>aggregation: <a class="external" href="https://gist.github.com/860785">https://gist.github.com/860785</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><em>available parameters for algorithm are aggregation</em></p>
+
+
+	<p><strong>Optional Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>keep_empty</td>
+			<td>carry over polygons that do not intersect with the aggregation (only works with aggregation)</td>
+			<td>keep_empty=1</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Returns</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>Dataset</td>
+			<td>returns the full resulting dataset</td>
+			<td><a class="external" href="https://gist.github.com/860926">https://gist.github.com/860926</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -X POST -u "username:password" -d "input[boundary]=21519" http://geocommons.com/datasets/98765/calculate.json?algorithm=aggregation</pre>
+
+	<h1 id="Maps-API">Maps API<a href="#Maps-API" class="wiki-anchor">&para;</a></h1>
+
+
+	<p><strong>Endpoint:</strong> <a class="external" href="http://geocommons.com/maps">http://geocommons.com/maps</a></p>
+
+
+	<p><strong>Description:</strong> The maps endpoint allows creation, styling, download and deletion of maps. Methods of modifying and deleting maps require basic authenitcation.  For download of maps it depends on the configuration of the GeoIQ instance for GeoCommons it is not required.</p>
+
+
+	<p><strong>HTTP Methods Available</strong>: GET, POST, PUT, DELETE</p>
+
+
+	<p><strong>URL Summary</strong></p>
+
+
+	<table>
+		<tr>
+			<td><strong>Task</strong></td>
+			<td><strong>URL</strong></td>
+			<td><strong>Formats</strong></td>
+			<td><strong>HTTP METHOD</strong></td>
+		</tr>
+		<tr>
+			<td>Download</td>
+			<td><a class="external" href="http://geocommons.com/maps/{id}.{format">http://geocommons.com/maps/{id}.{format</a>}</td>
+			<td>json, kml</td>
+			<td>GET</td>
+		</tr>
+		<tr>
+			<td>Create</td>
+			<td><a class="external" href="http://geocommons.com/maps">http://geocommons.com/maps</a></td>
+			<td>xml,json</td>
+			<td>POST</td>
+		</tr>
+		<tr>
+			<td>Update</td>
+			<td><a class="external" href="http://geocommons.com/maps/{id}.{format">http://geocommons.com/maps/{id}.{format</a>}</td>
+			<td>json,atom</td>
+			<td>PUT</td>
+		</tr>
+		<tr>
+			<td>Delete</td>
+			<td><a class="external" href="http://geocommons.com/maps/{id">http://geocommons.com/maps/{id</a>}</td>
+			<td>json</td>
+			<td>DELETE</td>
+		</tr>
+		<tr>
+			<td>Add Layer</td>
+			<td><a class="external" href="http://geocommons.com/maps/{id}/layers.{format">http://geocommons.com/maps/{id}/layers.{format</a>}</td>
+			<td>json</td>
+			<td>POST</td>
+		</tr>
+	</table>
+
+
+
+
+	<h2 id="Download-Map"><strong>Download Map</strong><a href="#Download-Map" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for maps that are not publicly shared.</p>
+
+
+	<p><strong>Required Parameters:</strong>(none)</p>
+
+
+	<p><strong>Optional Parameters:</strong>(none)</p>
+
+
+	<p><strong>Returns</strong></p>
+
+
+	<table>
+		<tr>
+			<td>*Type</td>
+			<td>Description</td>
+			<td>Example*</td>
+		</tr>
+		<tr>
+			<td>file</td>
+			<td>returns a file of the type requested</td>
+			<td><a class="external" href="http://geocommons.com/maps/51541.json">http://geocommons.com/maps/51541.json</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl http://geocommons.com/maps/51541.json</pre>
+
+	<h2 id="Create-Map"><strong>Create Map</strong><a href="#Create-Map" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for both GeoCommons and GeoIQ appliances.</p>
+
+
+	<p><strong>Required Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>title</td>
+			<td>the title of the map</td>
+			<td>title=World%20Population</td>
+		</tr>
+		<tr>
+			<td>basemap</td>
+			<td>the basemap provider</td>
+			<td>basemap="Acetate"</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Optional Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>description</td>
+			<td>text description of a map</td>
+			<td>description=This%20map%20shows</td>
+		</tr>
+		<tr>
+			<td>tags</td>
+			<td>tags categorizing you map</td>
+			<td>tags=economy</td>
+		</tr>
+		<tr>
+			<td>extent</td>
+			<td>array of the area covered by the map order is west,south,east,north</td>
+			<td>extent=[-180,-90,180,90]</td>
+		</tr>
+		<tr>
+			<td>projection</td>
+			<td>the projection of the map default is EPSG:3785 also supported is EPSG:4326</td>
+			<td>"projection=EPSG:4326"</td>
+		</tr>
+		<tr>
+			<td>layers</td>
+			<td>array of layers to add to the map</td>
+			<td>layers[][source]=finder:98696</td>
+		</tr>
+		<tr>
+			<td>permissions</td>
+			<td>must be admin on GeoCommons to change permissions, on GeoIQ must be data owner or have edit permissions</td>
+			<td>{"permissions": [{"group_id": "everyone", "permissions" : {"view":true,"download":false,"edit":false}]}</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Returns</strong></p>
+
+
+	<table>
+		<tr>
+			<td>*Type</td>
+			<td>Description</td>
+			<td>Example*</td>
+		</tr>
+		<tr>
+			<td>file</td>
+			<td>returns a file of the type requested</td>
+			<td><a class="external" href="http://geocommons.com/maps/51541.json">http://geocommons.com/maps/51541.json</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -u "user:password" -d "basemap=Google Terrain" -d "title=mappy" -X POST http://geocommons.com/maps.json
+</pre>
+
+<pre>curl -i -u "user:password" -d "basemap=Google Terrain" -d "title=Sample Custom Icon Map" -d "layers[][source]=finder:98696" -d "layers[][styles][icon][symbol]=http://farm5.static.flickr.com/4125/5219379732_e7251b5a47_o_d.png"   -X POST http://geocommons.com/maps.json</pre>
+
+<pre>curl -i -u "user:password" -d "layers[][source]=finder:92674" -d "title=Vehicles by Ward" -d "[layers][][styles][fill][classificationType]=St Deviation" -d "layers[][styles][fill][categories]=5" -d "layers[][styles][fill][colors][]=15725567" -d "layers[][styles][fill][colors][]=12441575" -d "layers[][styles][fill][colors][]=7057110" -d "layers[][styles][fill][colors][]=3244733" -d "layers[][styles][fill][colors][]=545180" -d "basemap=Google Terrain" -d "title=Abandoned Vehicle Requests by Ward DC" -d "layers[][styles][fill][selectedAttribute]=overdue request count" -d "layers[][styles][type]=CHOROPLETH"  -d "extent[]=-77" -d "extent[]=38" -d "extent[]=-76" -d "extent[]=39" -X POST http://geocommons.com/maps.json</pre>
+
+	<h2 id="Update-Map"><strong>Update Map</strong><a href="#Update-Map" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for both GeoCommons and GeoIQ appliances.</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>title</td>
+			<td>the title of the map</td>
+			<td>title=World%20Population</td>
+		</tr>
+		<tr>
+			<td>basemap</td>
+			<td>the basemap provider</td>
+			<td>basemap="Acetate"</td>
+		</tr>
+		<tr>
+			<td>description</td>
+			<td>text description of a map</td>
+			<td>description=This%20map%20shows</td>
+		</tr>
+		<tr>
+			<td>tags</td>
+			<td>tags categorizing you map</td>
+			<td>tags=economy</td>
+		</tr>
+		<tr>
+			<td>extent</td>
+			<td>array of the area covered by the map order is west,south,east,north</td>
+			<td>extent=[-180,-90,180,90]</td>
+		</tr>
+		<tr>
+			<td>projection</td>
+			<td>the projection of the map default is EPSG:3785 also supported is EPSG:4326</td>
+			<td>"projection=EPSG:4326"</td>
+		</tr>
+		<tr>
+			<td>permissions</td>
+			<td>must be admin on GeoCommons to change permissions, on GeoIQ must be data owner or have edit permissions</td>
+			<td>{"permissions": [{"group_id": "everyone", "permissions" : {"view":true,"download":false,"edit":false}]}</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Returns</strong></p>
+
+
+	<table>
+		<tr>
+			<td>*Type</td>
+			<td>Description</td>
+			<td>Example*</td>
+		</tr>
+		<tr>
+			<td>map</td>
+			<td>returns a representation of the updated map</td>
+			<td>{"updated_at": "2011/03/10 15:33:00 +0000", "basemap": "Google Terrain", "title": "changing the title like", "permissions": [], "tags": [], "layers": [], "extent": [-180.0, -85.0, 180.0, 85.0], "id": 56821, "description": null, "show_state": {"basemap": {"name": "Google Terrain", "providerType": null, "tint": {"redMultiplier": 1, "blueMultipler": 1, "greenMultipler": 1, "alphaMultiplier": 1, "greenOffset": 1, "blueOffset": 0, "alphaOffset": 0, "color": 0, "redOffset": 0}, "mapDisplayName": "Google Terrain", "vanillaColor": null, "tileType": null}}, "classification": null, "created_at": "2011/03/10 15:15:40 +0000"}</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -u "user:password" -d "title=changing the title like whoa" -X PUT http://geocommons.com/maps/56821.json</pre>
+
+	<h2 id="Delete-Map"><strong>Delete Map</strong><a href="#Delete-Map" class="wiki-anchor">&para;</a></h2>
+
+
+	<p>You can currently Delete maps by sending a DELETE HTTP request to the dataset endpoint.</p>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for all delete requests.</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters</strong>:  (none)</p>
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>HTTP Response</td>
+			<td>returns a HTTP response 204 no Content</td>
+			<td>HTTP/1.1 204 No Content</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -X DELETE -u "username:password" http://geocommons.com/maps/56290.json</pre>
+
+	<h2 id="Add-Layer-to-Map"><strong>Add Layer to Map</strong><a href="#Add-Layer-to-Map" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for both GeoCommons and GeoIQ appliances.</p>
+
+
+	<p><strong>Required Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>source</td>
+			<td>the source of the data layer for GeoIQ/GeoCommons layers it is "finder:xxxx" for external sources it is "url:http://example.com"</td>
+			<td>source=finder:98765</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Optional Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>title</td>
+			<td>the title of the layer</td>
+			<td>title="Population and Age"</td>
+		</tr>
+		<tr>
+			<td>subtitle</td>
+			<td>the subtitle of the layer</td>
+			<td>subtitle="200 Census Demographics</td>
+		</tr>
+		<tr>
+			<td>opacity</td>
+			<td>the opacity of the layer default is 1.0</td>
+			<td>opacity=.5</td>
+		</tr>
+		<tr>
+			<td>styles</td>
+			<td>the styling of the layer (see detailed styling information below)</td>
+			<td>see style examples below</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Returns</strong></p>
+
+
+	<table>
+		<tr>
+			<td>*Type</td>
+			<td>Description</td>
+			<td>Example*</td>
+		</tr>
+		<tr>
+			<td>Location</td>
+			<td>returns the index of the added layer in the map</td>
+			<td><a class="external" href="http://geocommons.com/maps/56821/layers/0.json">http://geocommons.com/maps/56821/layers/0.json</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -u "username:password" -d "source=finder:98765" -X POST http://geocommons.com/maps/56821/layers.json</pre>
+
+	<h3 id="Detailed-Map-Styling-Information"><strong>Detailed Map Styling Information</strong><a href="#Detailed-Map-Styling-Information" class="wiki-anchor">&para;</a></h3>
+
+
+	<p>The GeoIQ API allows extremely granular control of the look and feel of each individual map layer beyond what is available in the GUI.  All of the parameters fit into the styles parameter to specifically style a layer.</p>
+
+
+	<p><strong>Primary Options Styling:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Option</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>icon</td>
+			<td>the type of icon</td>
+			<td>icon:{symbol:"circle",size:3}</td>
+		</tr>
+		<tr>
+			<td>stroke</td>
+			<td>controls the color, transparency and thickness of the outline of a feature</td>
+			<td>"stroke": {"alpha": 1, "weight": 1, "color": 16777215}</td>
+		</tr>
+		<tr>
+			<td>fill</td>
+			<td>controls the inside color and opacity of a feature</td>
+			<td>"fill": {"opacity": 0.75, "color": 11637367}</td>
+		</tr>
+		<tr>
+			<td>temporal</td>
+			<td>controls if there is a time feature associated with a layer and which attribute is used</td>
+			<td>"temporal": {"attributes": ["timestamp"]}</td>
+		</tr>
+		<tr>
+			<td>type</td>
+			<td>the type of map layer options are: POINT, PRIMITIVE, GRADUATED, PROPORTIONAL, CHOROPLETH, PROPORTIONAL</td>
+			<td>"type": "GRADUATED"</td>
+		</tr>
+		<tr>
+			<td>click</td>
+			<td>controls the event when a layer feature is clicked on can either be a url or a javascript function</td>
+			<td>styles: { click: "javascript:showInfo('$[state]')" }</td>
+		</tr>
+		<tr>
+			<td>hover</td>
+			<td>controls the event when a feature is hovered over can be a javascript event or specific data for the info window</td>
+			<td>1 styles: { hover: "State: $[state]. Population: $[population]. Average Income: $[avg_inc_2000]" }</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Specific Styling Options:</strong></p>
+
+
+	<h4>Icon</h4>
+
+
+	<p>Specific Options for Styling the Icon</p>
+
+
+	<table>
+		<tr>
+			<td>Option</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>selectedAttribute</td>
+			<td>required for CHOROPLETH OR Graduated the attribute name of the dataset for theming</td>
+			<td>selectedAttribute: "rate of change"</td>
+		</tr>
+		<tr>
+			<td>color</td>
+			<td>hex or decimal number for icon fills</td>
+			<td> color: 0xFF0000</td>
+		</tr>
+		<tr>
+			<td>symbol</td>
+			<td>symbol name from palette of icons or URL to an image default are circle, propCircle, outlineCircle, hollowCircle, square, propSquare, outlineSquare, hollowSquare, balloonIcon, pushpinIcon, circleIcon, featherIcon, flagIcon, pushpinIcon, ringIcon, squareIcon, xPointIcon</td>
+			<td>{symbol: "outlineSquare"}, {symbol:"http://farm5.static.flickr.com/4125/5219379732_e7251b5a47_o_d.png"}</td>
+		</tr>
+		<tr>
+			<td>opacity</td>
+			<td>0 is tranparent 1 is opaque</td>
+			<td>opacity=.75</td>
+		</tr>
+		<tr>
+			<td>dropshadow</td>
+			<td>1 for a drop shadow underneath the icon, 0 for no drop shadow</td>
+			<td>dropshadow=1</td>
+		</tr>
+		<tr>
+			<td>lineStyle</td>
+			<td>the style of the line from the following styles: dashedThin,dashedThick,cased,thick,regular</td>
+			<td>{lineStyle: "dashedThin"}</td>
+		</tr>
+		<tr>
+			<td>size</td>
+			<td>scale size by area 0.1 is 10% of original size, 2 is twice the size (default:1)</td>
+			<td>{size: .2}</td>
+		</tr>
+		<tr>
+			<td>classificationType</td>
+			<td>type of classification algorithm to use Manual, Equal Interval, Quantile, St Deviation, Max Breaks, Critical Value (default: Equal Interval if type of CHOROPLETH)</td>
+			<td>{classificationType: "St Deviation"}</td>
+		</tr>
+		<tr>
+			<td>classificationBreaks</td>
+			<td>the specifically defined breaks required for {classificationType: "Manual"} array of values for the actual breakpoints for the bins</td>
+			<td>"classificationBreaks": [13, 13, 20, 30, 40, 50]</td>
+		</tr>
+		<tr>
+			<td>categories</td>
+			<td>number of categories or bins to use for classifying the data.  Not necessary if the <em>classificationType</em> is 'Manual' and the <em>classificationBreaks</em> (default is 5 if type is CHOROPLETH)</td>
+			<td>{"categories": 7}</td>
+		</tr>
+		<tr>
+			<td>range</td>
+			<td>the range of the data to bin, not required though useful if you only want to bin/display a specific portion of the data</td>
+			<td>"range": [13, 25]</td>
+		</tr>
+	</table>
+
+
+
+
+	<h4>Stroke</h4>
+
+
+	<p>Styling for the line that is the perimeter around a polygon or an icon.</p>
+
+
+	<table>
+		<tr>
+			<td>Option</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>color</td>
+			<td>the color either in hex or integer </td>
+			<td>color: 0xFF0000</td>
+		</tr>
+		<tr>
+			<td>alpha</td>
+			<td>the transparency 0 is transparent 1 is opaque (default: 0.75)</td>
+			<td>alpha: .5</td>
+		</tr>
+		<tr>
+			<td>weight</td>
+			<td>the thickness of the line</td>
+			<td>weight: 3</td>
+		</tr>
+	</table>
+
+
+
+
+	<h4>Fill</h4>
+
+
+	<table>
+		<tr>
+			<td>Option</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>selectedAttribute</td>
+			<td>required for CHOROPLETH OR Graduated the attribute name of the dataset for theming</td>
+			<td>selectedAttribute: "rate of change"</td>
+		</tr>
+		<tr>
+			<td>color</td>
+			<td>hex or decimal number for icon fills</td>
+			<td> color: 0xFF0000</td>
+		</tr>
+		<tr>
+			<td>colors</td>
+			<td>array of colors there should be a color value for each category. So if categories are 5 there should be 5 colors</td>
+			<td>"colors": [16573399, 15124426, 13938370, 12619966, 10450099, 7620507, 5313667]</td>
+		</tr>
+		<tr>
+			<td>opacity</td>
+			<td>0 is transparent 1 is opaque (default is .75</td>
+			<td>opacity: .5</td>
+		</tr>
+		<tr>
+			<td>classificationType</td>
+			<td>type of classification algorithm to use Manual, Equal Interval, Quantile, St Deviation, Max Breaks, Critical Value (default: Equal Interval if type of CHOROPLETH)</td>
+			<td>{classificationType: "St Deviation"}</td>
+		</tr>
+		<tr>
+			<td>classificationBreaks</td>
+			<td>the specifically defined breaks required for {classificationType: "Manual"} array of values for the actual breakpoints for the bins</td>
+			<td>"classificationBreaks": [13, 13, 20, 30, 40, 50]</td>
+		</tr>
+		<tr>
+			<td>categories</td>
+			<td>number of categories or bins to use for classifying the data.  Not necessary if the <em>classificationType</em> is 'Manual' and the <em>classificationBreaks</em> (default is 5 if type is CHOROPLETH)</td>
+			<td>{"categories": 7}</td>
+		</tr>
+	</table>
+
+
+
+
+	<h4>Temporal</h4>
+
+
+	<p>If a layer has an attribute column with a time component temporal information can be defined in the layer.</p>
+
+
+	<table>
+		<tr>
+			<td>Option</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>attributes</td>
+			<td>the column to animate temporally by</td>
+			<td>attributes: ["timestamp"]</td>
+		</tr>
+	</table>
+
+
+
+
+	<h4>Time Slider</h4>
+
+
+	<p>You can specify a specific <code>begin</code>, <code>end</code>, and <code>period</code> of both the time window and the time slider on the map. Time elements can be any of:</p>
+
+
+	<ul>
+	<li>ISO8601 - YYYYMMDDTHH:MM:SSZ (e.g. 20100801T12:31:22Z, or 20100801T07:31:22-0500)</li>
+		<li>String for "now" </li>
+		<li>Milliseconds since (or before for negative) Epoch - Midnight, January 1, 1970</li>
+	</ul>
+
+
+	<p>For <strong>period</strong> - it is the span of the timeslider or timeline in milliseconds.</p>
+
+
+	<table>
+		<tr>
+			<td>Option</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>slider</td>
+			<td>the period of time the slider (window of data being shown) covers in milliseconds or "now" for current time</td>
+			<td>"slider": {"period":86400,"end":"now"}</td>
+		</tr>
+		<tr>
+			<td>timeline</td>
+			<td>the range of time the slider covers</td>
+			<td>"timeline":{"begin":"20100505T00:00:00Z", "end": "now"}</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><img src="Time_Controls.png" alt="" /></p>
+
+
+	<p><em>Only use 2 of the begin/end/period variables or specify _null</em>. For example, setting end: "now" and period:86400 would show the last day of data._</p>
+
+
+	<h4>Color Samples</h4>
+
+
+	<p>GeoIQ supports any hexadecimal color values for setting the icon, fill, stroke, or color ramps. However, in designing GeoIQ we spent considerable time and research considering how semi-transparent colors appeared on top of basemaps while retaining high-contrast and impact. We recommend using these, or similar color schemes, when designing your maps using the GeoIQ API.</p>
+
+
+	<p><strong>Diverging</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x909FC2, 0xFE9929]</li>
+		<li>ramp:[0x909FC2, 0xF7F7F7, 0xFE9929]</li>
+		<li>ramp:[0x909FC2, 0xD0D1E6, 0xFEE281, 0xFE9929]</li>
+		<li>ramp:[0x909FC2, 0xD0D1E6, 0xF7F7F7, 0xFEE281, 0xFE9929]</li>
+		<li>ramp:[0x44637B, 0x909FC2, 0xD0D1E6, 0xFEE281, 0xFE9929, 0xB84C02]</li>
+		<li>ramp:[0x44637B, 0x909FC2, 0xD0D1E6, 0xF7F7F7, 0xFEE281, 0xFE9929, 0xB84C02]</li>
+	</ul>
+
+
+	<p><strong>Diverging_Reverse</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xFE9929, 0x909FC2]</li>
+		<li>ramp:[0xFE9929, 0xF7F7F7, 0x909FC2]</li>
+		<li>ramp:[0xFE9929, 0xFEE281, 0xD0D1E6, 0x909FC2]</li>
+		<li>ramp:[0xFE9929, 0xFEE281, 0xF7F7F7, 0xD0D1E6, 0x909FC2]</li>
+		<li>ramp:[0xB84C02, 0xFE9929, 0xFEE281, 0xD0D1E6, 0x909FC2, 0x44637B]</li>
+		<li>ramp:[0xB84C02, 0xFE9929, 0xFEE281, 0xF7F7F7, 0xD0D1E6, 0x909FC2, 0x44637B]</li>
+	</ul>
+
+
+	<p><strong>White-Brown</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xD7C5AE, 0x866C5D]</li>
+		<li>ramp:[0xD7C5AE, 0xB89A81, 0x866C5D]</li>
+		<li>ramp:[0xD7C5AE, 0xB89A81, 0x866C5D, 0x5E4840]</li>
+		<li>ramp:[0xEBD9C2, 0xD1B79F, 0xA4866D, 0x7C6253, 0x4A342C]</li>
+		<li>ramp:[0xEBD9C2, 0xD1B79F, 0xA4866D, 0x7C6253, 0x543E36, 0x361E18]</li>
+		<li>ramp:[0xEBD9C2, 0xD1B79F, 0xB19277, 0x917763, 0x72594B, 0x543E36, 0x361E18]</li>
+	</ul>
+
+
+	<p><strong>Brown-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x866C5D, 0xD7C5AE]</li>
+		<li>ramp:[0x866C5D, 0xB89A81, 0xD7C5AE]</li>
+		<li>ramp:[0x5E4840, 0x866C5D, 0xB89A81, 0xD7C5AE]</li>
+		<li>ramp:[0x4A342C, 0x7C6253, 0xA4866D, 0xD1B79F, 0xEBD9C2]</li>
+		<li>ramp:[0x361E18, 0x543E36, 0x7C6253, 0xA4866D, 0xD1B79F, 0xEBD9C2]</li>
+		<li>ramp:[0x361E18, 0x543E36, 0x72594B, 0x917763, 0xB19277, 0xD1B79F, 0xEBD9C2]</li>
+	</ul>
+
+
+	<p><strong>White-Gray</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xF0F0F0, 0x636363]</li>
+		<li>ramp:[0xF0F0F0, 0xBDBDBD, 0x636363]</li>
+		<li>ramp:[0xF7F7F7, 0xCCCCCC, 0x969696, 0x525252]</li>
+		<li>ramp:[0xF7F7F7, 0xCCCCCC, 0x969696, 0x636363, 0x252525]</li>
+		<li>ramp:[0xF7F7F7, 0xD9D9D9, 0xBDBDBD, 0x969696, 0x636363, 0x252525]</li>
+		<li>ramp:[0xF7F7F7, 0xD9D9D9, 0xBDBDBD, 0x969696, 0x737373, 0x525252, 0x252525]</li>
+	</ul>
+
+
+	<p><strong>Gray-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x636363, 0xF0F0F0]</li>
+		<li>ramp:[0x636363, 0xBDBDBD, 0xF0F0F0]</li>
+		<li>ramp:[0x525252, 0x969696, 0xCCCCCC, 0xF7F7F7]</li>
+		<li>ramp:[0x252525, 0x636363, 0x969696, 0xCCCCCC, 0xF7F7F7]</li>
+		<li>ramp:[0x252525, 0x636363, 0x969696, 0xBDBDBD, 0xD9D9D9, 0xF7F7F7]</li>
+		<li>ramp:[0x252525, 0x525252, 0x737373, 0x969696, 0xBDBDBD, 0xD9D9D9, 0xF7F7F7]</li>
+	</ul>
+
+
+	<p><strong>White-Dark Green</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xD0D1E6, 0x44637B]</li>
+		<li>ramp:[0xD0D1E6, 0x909FC2, 0x44637B]</li>
+		<li>ramp:[0xD0D1E6, 0x909FC2, 0x44637B, 0x2D4542]</li>
+		<li>ramp:[0xDADBE6, 0xB0B3DB, 0x7286B1, 0x44637B, 0x2D4542]</li>
+		<li>ramp:[0xDADBE6, 0xB0B3DB, 0x7286B1, 0x4E6D8A, 0x2D4A4C, 0x192E24]</li>
+		<li>ramp:[0xDADBE6, 0xB0B3DB, 0x7C86B6, 0x547298, 0x375976, 0x2D4A4C, 0x192E24]</li>
+	</ul>
+
+
+	<p><strong>Dark Green-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x44637B, 0xD0D1E6]</li>
+		<li>ramp:[0x44637B, 0x909FC2, 0xD0D1E6]</li>
+		<li>ramp:[0x2D4542, 0x44637B, 0x909FC2, 0xD0D1E6]</li>
+		<li>ramp:[0x2D4542, 0x44637B, 0x7286B1, 0xB0B3DB, 0xDADBE6]</li>
+		<li>ramp:[0x192E24, 0x2D4A4C, 0x4E6D8A, 0x7286B1, 0xB0B3DB, 0xDADBE6]</li>
+		<li>ramp:[0x192E24, 0x2D4A4C, 0x375976, 0x547298, 0x7C86B6, 0xB0B3DB, 0xDADBE6]</li>
+	</ul>
+
+
+	<p><strong>White-Orange</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xFEE281, 0xB84C02]</li>
+		<li>ramp:[0xFEE281, 0xFE9929, 0xB84C02]</li>
+		<li>ramp:[0xFEE281, 0xFE9929, 0xB84C02, 0x822D04]</li>
+		<li>ramp:[0xFEF7A5, 0xFECE6D, 0xEC8414, 0xAE4C02, 0x662506]</li>
+		<li>ramp:[0xFEF7A5, 0xFECE6D, 0xEC8414, 0xAE4C02, 0x793404, 0x512506]</li>
+		<li>ramp:[0xFEF7A5, 0xFECE6D, 0xFEA329, 0xD96814, 0xAE4C02, 0x793404, 0x512506]</li>
+	</ul>
+
+
+	<p><strong>Orange-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xB84C02, 0xFEE281]</li>
+		<li>ramp:[0xB84C02, 0xFE9929, 0xFEE281]</li>
+		<li>ramp:[0x822D04, 0xB84C02, 0xFE9929, 0xFEE281]</li>
+		<li>ramp:[0x662506, 0xAE4C02, 0xEC8414, 0xFECE6D, 0xFEF7A5]</li>
+		<li>ramp:[0x512506, 0x793404, 0xAE4C02, 0xEC8414, 0xFECE6D, 0xFEF7A5]</li>
+		<li>ramp:[0x512506, 0x793404, 0xAE4C02, 0xD96814, 0xFEA329, 0xFECE6D, 0xFEF7A5]</li>
+	</ul>
+
+
+	<p><strong>White-Red</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xFEE0D2, 0xDE2D26]</li>
+		<li>ramp:[0xFEE0D2, 0xFC9272, 0xDE2D26]</li>
+		<li>ramp:[0xFEE5D9, 0xFCAE91, 0xFB6A4A, 0xCB181D]</li>
+		<li>ramp:[0xFEE5D9, 0xFCAE91, 0xFB6A4A, 0xDE2D26, 0xA50F15]</li>
+		<li>ramp:[0xFEE5D9, 0xFCBBA1, 0xFC9272, 0xFB6A4A, 0xDE2D26, 0xA50F15]</li>
+		<li>ramp:[0xFEE5D9, 0xFCBBA1, 0xFC9272, 0xFB6A4A, 0xEF3B2C, 0xCB181D, 0x99000D]</li>
+	</ul>
+
+
+	<p><strong>Red-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xDE2D26, 0xFEE0D2]</li>
+		<li>ramp:[0xDE2D26, 0xFC9272, 0xFEE0D2]</li>
+		<li>ramp:[0xCB181D, 0xFB6A4A, 0xFCAE91, 0xFEE5D9]</li>
+		<li>ramp:[0xA50F15, 0xDE2D26, 0xFB6A4A, 0xFCAE91, 0xFEE5D9]</li>
+		<li>ramp:[0xA50F15, 0xDE2D26, 0xFB6A4A, 0xFC9272, 0xFCBBA1, 0xFEE5D9]</li>
+		<li>ramp:[0x99000D, 0xCB181D, 0xEF3B2C, 0xFB6A4A, 0xFC9272, 0xFCBBA1, 0xFEE5D9]</li>
+	</ul>
+
+
+	<p><strong>White-Green</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xF7FCB9, 0x31A354]</li>
+		<li>ramp:[0xF7FCB9, 0xADDD8E, 0x31A354]</li>
+		<li>ramp:[0xFFFFCC, 0xC2E699, 0x78C679, 0x238443]</li>
+		<li>ramp:[0xFFFFCC, 0xC2E699, 0x78C679, 0x31A354, 0x006837]</li>
+		<li>ramp:[0xFFFFCC, 0xD9F0A3, 0xADDD8E, 0x78C679, 0x31A354, 0x006837]</li>
+		<li>ramp:[0xFFFFCC, 0xD9F0A3, 0xADDD8E, 0x78C679, 0x41AB5D, 0x238443, 0x005A32]</li>
+	</ul>
+
+
+	<p><strong>Green-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x31A354, 0xF7FCB9]</li>
+		<li>ramp:[0x31A354, 0xADDD8E, 0xF7FCB9]</li>
+		<li>ramp:[0x238443, 0x78C679, 0xC2E699, 0xFFFFCC]</li>
+		<li>ramp:[0x006837, 0x31A354, 0x78C679, 0xC2E699, 0xFFFFCC]</li>
+		<li>ramp:[0x006837, 0x31A354, 0x78C679, 0xADDD8E, 0xD9F0A3, 0xFFFFCC]</li>
+		<li>ramp:[0x005A32, 0x238443, 0x41AB5D, 0x78C679, 0xADDD8E, 0xD9F0A3, 0xFFFFCC]</li>
+	</ul>
+
+
+	<p><strong>White-Blue</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xDEEBF7, 0x3182BD]</li>
+		<li>ramp:[0xDEEBF7, 0x9ECAE1, 0x3182BD]</li>
+		<li>ramp:[0xEFF3FF, 0xBDD7E7, 0x6BAED6, 0x2171B5]</li>
+		<li>ramp:[0xEFF3FF, 0xBDD7E7, 0x6BAED6, 0x3182BD, 0x08519C]</li>
+		<li>ramp:[0xEFF3FF, 0xC6DBEF, 0x9ECAE1, 0x6BAED6, 0x3182BD, 0x08519C]</li>
+		<li>ramp:[0xEFF3FF, 0xC6DBEF, 0x9ECAE1, 0x6BAED6, 0x4292C6, 0x2171B5, 0x084594]</li>
+	</ul>
+
+
+	<p><strong>Blue-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x3182BD, 0xDEEBF7]</li>
+		<li>ramp:[0x3182BD, 0x9ECAE1, 0xDEEBF7]</li>
+		<li>ramp:[0x2171B5, 0x6BAED6, 0xBDD7E7, 0xEFF3FF]</li>
+		<li>ramp:[0x08519C, 0x3182BD, 0x6BAED6, 0xBDD7E7, 0xEFF3FF]</li>
+		<li>ramp:[0x08519C, 0x3182BD, 0x6BAED6, 0x9ECAE1, 0xC6DBEF, 0xEFF3FF]</li>
+		<li>ramp:[0x084594, 0x2171B5, 0x4292C6, 0x6BAED6, 0x9ECAE1, 0xC6DBEF, 0xEFF3FF]</li>
+	</ul>
+
+
+	<p><strong>White-Purple</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xF5D9D7, 0x7268A4]</li>
+		<li>ramp:[0xF5D9D7, 0xD4AEC2, 0x7268A4]</li>
+		<li>ramp:[0xFCE3D7, 0xE3BBC2, 0xC090BD, 0x74479A]</li>
+		<li>ramp:[0xFCE3D7, 0xE3BBC2, 0xC090BD, 0x835BA4, 0x511483]</li>
+		<li>ramp:[0xFCE3D7, 0xE6C7CA, 0xD4AEC2, 0xC090BD, 0x835BA4, 0x511483]</li>
+		<li>ramp:[0xFCE3D7, 0xE6C7CA, 0xD4AEC2, 0xC090BD, 0x9F74B3, 0x74479A, 0x511483]</li>
+	</ul>
+
+
+	<p><strong>Purple-White</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x7268A4, 0xF5D9D7]</li>
+		<li>ramp:[0x7268A4, 0xD4AEC2, 0xF5D9D7]</li>
+		<li>ramp:[0x74479A, 0xC090BD, 0xE3BBC2, 0xFCE3D7]</li>
+		<li>ramp:[0x511483, 0x835BA4, 0xC090BD, 0xE3BBC2, 0xFCE3D7]</li>
+		<li>ramp:[0x511483, 0x835BA4, 0xC090BD, 0xD4AEC2, 0xE6C7CA, 0xFCE3D7]</li>
+		<li>ramp:[0x511483, 0x74479A, 0x9F74B3, 0xC090BD, 0xD4AEC2, 0xE6C7CA, 0xFCE3D7]</li>
+	</ul>
+
+
+	<p><strong>Green-Purple</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x78C679, 0xC090BD]</li>
+		<li>ramp:[0x78C679, 0xF7F7F7, 0xC090BD]</li>
+		<li>ramp:[0x78C679, 0xD9F0A3, 0xE6C7CA, 0xC090BD]</li>
+		<li>ramp:[0x78C679, 0xD9F0A3, 0xF7F7F7, 0xE6C7CA, 0xC090BD]</li>
+		<li>ramp:[0x238443, 0x78C679, 0xD9F0A3, 0xE6C7CA, 0xC090BD, 0x74479A]</li>
+		<li>ramp:[0x238443, 0x78C679, 0xD9F0A3, 0xF7F7F7, 0xE6C7CA, 0xC090BD, 0x74479A]</li>
+	</ul>
+
+
+	<p><strong>Purple-Green</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xC090BD, 0x78C679]</li>
+		<li>ramp:[0xC090BD, 0xF7F7F7, 0x78C679]</li>
+		<li>ramp:[0xC090BD, 0xE6C7CA, 0xD9F0A3, 0x78C679]</li>
+		<li>ramp:[0xC090BD, 0xE6C7CA, 0xF7F7F7, 0xD9F0A3, 0x78C679]</li>
+		<li>ramp:[0x74479A, 0xC090BD, 0xE6C7CA, 0xD9F0A3, 0x78C679, 0x238443]</li>
+		<li>ramp:[0x74479A, 0xC090BD, 0xE6C7CA, 0xF7F7F7, 0xD9F0A3, 0x78C679, 0x238443]</li>
+	</ul>
+
+
+	<p><strong>Blue-Red</strong></p>
+
+
+	<ul>
+	<li>ramp:[0x4292C6, 0xFF776D]</li>
+		<li>ramp:[0x4292C6, 0xF7F7F7, 0xFF776D]</li>
+		<li>ramp:[0x4292C6, 0xC6DBEF, 0xFCC5BB, 0xFF776D]</li>
+		<li>ramp:[0x4292C6, 0xC6DBEF, 0xF7F7F7, 0xFCC5BB, 0xFF776D]</li>
+		<li>ramp:[0x2171B5, 0x4292C6, 0xC6DBEF, 0xFCC5BB, 0xFF776D, 0xCB181D]</li>
+		<li>ramp:[0x2171B5, 0x4292C6, 0xC6DBEF, 0xF7F7F7, 0xFCC5BB, 0xFF776D, 0xCB181D]</li>
+	</ul>
+
+
+	<p><strong>Red-Blue</strong></p>
+
+
+	<ul>
+	<li>ramp:[0xFF776D, 0x4292C6]</li>
+		<li>ramp:[0xFF776D, 0xF7F7F7, 0x4292C6]</li>
+		<li>ramp:[0xFF776D, 0xFCC5BB, 0xC6DBEF, 0x4292C6]</li>
+		<li>ramp:[0xFF776D, 0xFCC5BB, 0xF7F7F7, 0xC6DBEF, 0x4292C6]</li>
+		<li>ramp:[0xCB181D, 0xFF776D, 0xFCC5BB, 0xC6DBEF, 0x4292C6, 0x2171B5]</li>
+		<li>ramp:[0xCB181D, 0xFF776D, 0xFCC5BB, 0xF7F7F7, 0xC6DBEF, 0x4292C6, 0x2171B5]</li>
+	</ul>
+
+
+	<h1 id="Search-API">Search API<a href="#Search-API" class="wiki-anchor">&para;</a></h1>
+
+
+	<p><strong>Endpoint:</strong> <a class="external" href="http://geocommons.com/search">http://geocommons.com/search</a></p>
+
+
+	<p><strong>Description:</strong> GeoIQ provides a common search across the application using the OpenSearch protocol.</p>
+
+
+	<p><strong>HTTP Methods Available:</strong> GET</p>
+
+
+	<p><strong>URL Summary:</strong></p>
+
+
+	<table>
+		<tr>
+			<td><strong>Task</strong></td>
+			<td><strong>URL</strong></td>
+			<td><strong>Formats</strong></td>
+			<td><strong>HTTP METHOD</strong></td>
+		</tr>
+		<tr>
+			<td>search</td>
+			<td><a class="external" href="http://geocommons.com/search.{format">http://geocommons.com/search.{format</a>}</td>
+			<td>atom,json,kml</td>
+			<td>GET</td>
+		</tr>
+	</table>
+
+
+
+
+	<h2 id="Search"><strong>Search</strong><a href="#Search" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Not required for GeoCommons datasets, GeoIQ appliance datasets depends on the permissions of the data</p>
+
+
+	<p><strong>Required Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>query</td>
+			<td>information to search on</td>
+			<td>query=unemployment</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Optional Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>bbox</td>
+			<td>a box encompassing the area being searched the order is West/South/East/North</td>
+			<td>bbox=-79.5,20,-78,50</td>
+		</tr>
+		<tr>
+			<td>page</td>
+			<td>which page of results to return</td>
+			<td>page=3</td>
+		</tr>
+		<tr>
+			<td>limit</td>
+			<td>number of results to return</td>
+			<td>limit=15</td>
+		</tr>
+		<tr>
+			<td>order</td>
+			<td>'ascending' or 'descending' of the sort attribute (default ascending)</td>
+			<td>order=descending</td>
+		</tr>
+		<tr>
+			<td>sort</td>
+			<td>attribute name to sort on</td>
+			<td>sort=name</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><em>A user can search specifically within the fields by prefixing "title:", "description:" or "tag:" before the query. So for example <a class="external" href="http://geocommons.com/search.atom?query=tag:economics">http://geocommons.com/search.atom?query=tag:economics</a> would return only data that has been tagged with "economics".</em></p>
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>file</td>
+			<td>returns a file of the type requested</td>
+			<td>curl <a class="external" href="http://geocommons.com/search.json?query=chickens&#38;limit=2&#38;page=3">http://geocommons.com/search.json?query=chickens&#38;limit=2&#38;page=3</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl http://geocommons.com/search.json?query=chickens</pre><br /><pre>curl http://geocommons.com/search.json?query=chickens&#38;limit=2&#38;page=3</pre>
+
+	<h1 id="Groups-API-GeoIQ-Appliance-Feature-Only">Groups API (GeoIQ Appliance Feature Only)<a href="#Groups-API-GeoIQ-Appliance-Feature-Only" class="wiki-anchor">&para;</a></h1>
+
+
+	<p><strong>Endpoint:</strong> <a class="external" href="http://geocommons.com/groups">http://geocommons.com/groups</a></p>
+
+
+	<p><strong>Description:</strong> The Groups API allows creation of groups of users to allow for granular access control to maps, data and analysis within GeoIQ.</p>
+
+
+	<p><strong>HTTP Methods Available:</strong> GET, POST, PUT, DELETE</p>
+
+
+	<p><strong>URL Summary:</strong></p>
+
+
+	<table>
+		<tr>
+			<td><strong>Task</strong></td>
+			<td><strong>URL</strong></td>
+			<td><strong>Formats</strong></td>
+			<td><strong>HTTP METHOD</strong></td>
+		</tr>
+		<tr>
+			<td>create</td>
+			<td><a class="external" href="http://geocommons.com/groups.{format">http://geocommons.com/groups.{format</a>}</td>
+			<td>json</td>
+			<td>POST</td>
+		</tr>
+		<tr>
+			<td>add user</td>
+			<td><a class="external" href="http://geocommons.com/groups/{id}/users.{format">http://geocommons.com/groups/{id}/users.{format</a>}</td>
+			<td>json</td>
+			<td>POST</td>
+		</tr>
+		<tr>
+			<td>list group users</td>
+			<td><a class="external" href="http://geocommons.com/groups/{id}/users.{format">http://geocommons.com/groups/{id}/users.{format</a></td>
+			<td>json</td>
+			<td>GET</td>
+		</tr>
+		<tr>
+			<td>delete</td>
+			<td><a class="external" href="http://geocommons.com/groups/{id}.{format">http://geocommons.com/groups/{id}.{format</a>}</td>
+			<td>json</td>
+			<td>DELETE</td>
+		</tr>
+	</table>
+
+
+
+
+	<h2 id="Create-Group"><strong>Create Group</strong><a href="#Create-Group" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for both GeoCommons and GeoIQ appliances.  The account being used must also be an administrator.</p>
+
+
+	<p><strong>Required Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>group[name]</td>
+			<td>the name of the group</td>
+			<td>group[name]=thegroup</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Optional Parameters:</strong> (none)</p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>Location</td>
+			<td>returns the URI of the file requested</td>
+			<td><a class="external" href="http://geocommons.com/groups/23360.json">http://geocommons.com/groups/23360.json</a></td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -u "user:password" -X POST -i -d "group[name]=example_group" http://geocommons.com/groups.json</pre>
+
+	<h2 id="Add-User-to-Group"><strong>Add User to Group</strong><a href="#Add-User-to-Group" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for both GeoCommons and GeoIQ appliances.  The account being used must also be an administrator.</p>
+
+
+	<p><strong>Required Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>"username"</td>
+			<td>user to be added to the group</td>
+			<td>kate</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Optional Parameters:</strong> (none)</p>
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -u "user:password" -d "kate" -X  POST http://geocommons.com/groups/23150/users.json</pre>
+
+	<h2 id="List-Group-Users"><strong>List Group Users</strong><a href="#List-Group-Users" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for both GeoCommons and GeoIQ appliances.  The account being used must also be an administrator.</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters:</strong> (none)</p>
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -u "user:password" http://geocommons.com/groups/23150/users.json</pre>
+
+	<h2 id="Delete-Group"><strong>Delete Group</strong><a href="#Delete-Group" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Basic authentication is required for both GeoCommons and GeoIQ appliances.  The account being used must also be an administrator.</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters:</strong> (none)</p>
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -u "user:password" -X DELETE http://geocommons.com/groups/23150.json</pre>
+
+	<h1 id="Users-API">Users API<a href="#Users-API" class="wiki-anchor">&para;</a></h1>
+
+
+	<p><strong>Endpoint:</strong> <a class="external" href="http://geocommons.com/users">http://geocommons.com/users</a></p>
+
+
+	<p><strong>Description:</strong> Used to create, modify and delete GeoCommons and GeoIQ users.</p>
+
+
+	<p><strong>HTTP Methods Available:</strong> GET POST PUT DELETE</p>
+
+
+	<p><strong>URL Summary:</strong></p>
+
+
+	<table>
+		<tr>
+			<td><strong>Task</strong></td>
+			<td><strong>URL</strong></td>
+			<td><strong>Formats</strong></td>
+			<td><strong>HTTP METHOD</strong></td>
+		</tr>
+		<tr>
+			<td>create</td>
+			<td><a class="external" href="http://geocommons.com/users.{format">http://geocommons.com/users.{format</a>}</td>
+			<td>json</td>
+			<td>POST</td>
+		</tr>
+		<tr>
+			<td>retrieve</td>
+			<td><a class="external" href="http://geocommons.com/users/{username}.{format">http://geocommons.com/users/{username}.{format</a>}</td>
+			<td>json</td>
+			<td>GET</td>
+		</tr>
+		<tr>
+			<td>modify</td>
+			<td><a class="external" href="http://geocommons.com/users/{username}.{format">http://geocommons.com/users/{username}.{format</a>}</td>
+			<td>json</td>
+			<td>PUT</td>
+		</tr>
+		<tr>
+			<td>delete</td>
+			<td><a class="external" href="http://geocommons.com/users/{username}.{format">http://geocommons.com/users/{username}.{format</a>}</td>
+			<td>json</td>
+			<td>DELETE</td>
+		</tr>
+	</table>
+
+
+
+
+	<h2 id="Create-User"><strong>Create User</strong><a href="#Create-User" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Authentication not required for GeoCommons.  GeoIQ appliances where user sign-up is disabled require basic authentication by an administrative user account.</p>
+
+
+	<p><strong>Required Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>user[login]</td>
+			<td>username that the user will login with</td>
+			<td>user[login]=johndoe</td>
+		</tr>
+		<tr>
+			<td>user[password]</td>
+			<td>password the user will login with</td>
+			<td>user[password]=s3curepassword</td>
+		</tr>
+		<tr>
+			<td>user[password_confirmation]</td>
+			<td>sample information as password the user will login with</td>
+			<td>user[password_confirmation]=s3curepassword</td>
+		</tr>
+		<tr>
+			<td>user[email]</td>
+			<td>users email address</td>
+			<td>user[email]=<a class="email" href="mailto:john@example.com">john@example.com</a></td>
+		</tr>
+		<tr>
+			<td>user[fullname]</td>
+			<td>full name of the person whose account it is</td>
+			<td>"user[fullname]=John G. Doe"</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Optional Parameters:</strong> (none)</p>
+
+
+	<p><strong>Returns:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Type</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+	</table>
+
+
+
+
+	<table>
+		<tr>
+			<td>user object</td>
+			<td>returns id, login,email of created user</td>
+			<td>{"User": {"id": 23250, "login": "sampleapiuser", "email": "<a class="email" href="mailto:sampleapiuser1@example.com">sampleapiuser1@example.com</a>"}}</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -X POST -d "user[login]=sampleapiuser" -d "user[password]=password" -d "user[password_confirmation]=password" -d "user[email]=sampleapiuser@example.com" -d "user[fullname]=Sample A. User" http://geocommons.com/users.json</pre>
+
+	<h2 id="Retrieve-User-Info"><strong>Retrieve User Info</strong><a href="#Retrieve-User-Info" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Not required, but to get full user information basic authentication is required and the account must also be an administrator</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters:</strong> (none)</p>
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -u "username:password" http://geocommons.com/users/kate.json</pre>
+
+	<h2 id="Modify-User"><strong>Modify User</strong><a href="#Modify-User" class="wiki-anchor">&para;</a></h2>
+
+
+	<p><strong>Authentication:</strong></p>
+
+
+	<p>Must use basic authentication utilizing the account of the user being modified or an administrative account</p>
+
+
+	<p><strong>Required Parameters:</strong> (none)</p>
+
+
+	<p><strong>Optional Parameters:</strong></p>
+
+
+	<table>
+		<tr>
+			<td>Parameter</td>
+			<td>Description</td>
+			<td>Example</td>
+		</tr>
+		<tr>
+			<td>user[password]</td>
+			<td>password the user will login with</td>
+			<td>user[password]=s3curepassword</td>
+		</tr>
+		<tr>
+			<td>user[password_confirmation]</td>
+			<td>sample information as password the user will login with must be used in conjunction with user[password] if modifying a users password</td>
+			<td>user[password_confirmation]=s3curepassword</td>
+		</tr>
+		<tr>
+			<td>user[email]</td>
+			<td>users email address</td>
+			<td>user[email]=<a class="email" href="mailto:john@example.com">john@example.com</a></td>
+		</tr>
+		<tr>
+			<td>user[fullname]</td>
+			<td>full name of the person whose account it is</td>
+			<td>"user[fullname]=John G. Doe"</td>
+		</tr>
+	</table>
+
+
+
+
+	<p><strong>Curl Examples:</strong></p>
+
+
+<pre>curl -i -u "username:password" -X PUT -d "user[email]=anotheremail@example.com" http://geocommons.com/users/sampleapiuser.json</pre><br /><pre>curl -i -u "username:password" -X PUT -d "user[password]=newpassword" -d "user[password_confirmation]=newpassword" http://geocommons.com/users/sampleapiuser.json</pre>
+</body>
+</html>
