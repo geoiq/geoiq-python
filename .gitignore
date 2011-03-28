@@ -1,0 +1,7 @@
+scratch
+*.pyc
+
+# Emacs stuff:
+*~
+.#*
+*#
