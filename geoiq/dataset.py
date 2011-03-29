@@ -19,14 +19,16 @@ class DatasetSvc(geoiq.GeoIQSvc):
 
 
 class Dataset(geoiq.GeoIQObj):
-    iqprops = geoiq.props("title",
-                          "description",
-                          "tags",
-                          "published",
-                          "data_type",
-                          "feature_count",
-                          "link")
 
     def request_feed_update(self):
         service.request_feed_update(self)
 
+jsonwrap.props(Dataset,
+               "title",
+               "description",
+               "tags",
+               "published",
+               "data_type",
+               "feature_count",
+               "link")
+               

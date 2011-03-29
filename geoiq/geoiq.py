@@ -87,16 +87,14 @@ class GeoIQSvc(object):
     def update(self, obj):
         pass
 
-props = jsonwrap.props
-
 def url_dict(d):
     return dict( ((k,urllib.quote(str(v))) for (k,v) in d.iteritems()) )
 
-class GeoIQObj(jsonwrap.JsonMappedObj):
+class GeoIQObj(jsonwrap.JsonWrappedObj):
     """
     Base class for GeoIQ's RESTful entities (things with an ID)
     """
-    iqprops = props(geoiq_id={'ro':True, 'mapto':'id'})
+
 
     @classmethod
     def is_ro(cls): return False
@@ -119,3 +117,5 @@ class GeoIQObj(jsonwrap.JsonMappedObj):
     
     def delete(self):
         pass
+
+jsonwrap.props(GeoIQObj,geoiq_id={'ro':True, 'mapto':'id'})

@@ -27,19 +27,31 @@ class SearchSvc(geoiq.GeoIQSvc):
             total = res['totalResults']
             yield fin
 
-class SearchPointer(jsonwrap.JsonMappedObj):
-    iqprops = geoiq.props("detail_link","description","type","tags",
-                          "author", "id")
+class SearchPointer(jsonwrap.JsonWrappedObj):
+
     def __init__(self, props, svc):
-        jsonwrap.JsonMappedObj.__init__(self, props)
+        jsonwrap.JsonWrappedObj.__init__(self, props)
         self.svc = svc
 
     def load(self):
         pass
 
+jsonwrap.props(SearchPointer,
+               "detail_link",
+               "description",
+               "type",
+               "tags",
+               "author", 
+               "id")
+
+
 def search_pointers(ptrs, *args, **kwargs):
     return [SearchPointer(p,*args,**kwargs) for p in ptrs]
 
-class SearchPage(jsonwrap.JsonMappedObj):
-    iqprops = geoiq.props("totalResults",
-                          entries={ "ro":True, "map_in": search_pointers })
+class SearchPage(jsonwrap.JsonWrappedObj):
+    pass
+
+jsonwrap.props(SearchPage,
+               "totalResults",
+               entries={ "ro":True, 
+                         "map_in": jsonwrap.wrap_many(SearchPointer) })
