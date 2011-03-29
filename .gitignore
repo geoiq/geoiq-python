@@ -1,5 +1,14 @@
+# Python packaging artifacts:
+geoiq.egg-info
+build
+dist
+
+# Temp/scratch
 scratch
+
+# Compiled python
 *.pyc
+
 
 # Emacs stuff:
 *~
