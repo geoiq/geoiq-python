@@ -1,9 +1,11 @@
-##
-# Base...
-import urllib2 as u
+
+import urllib2 as u, poster.encode, poster.streaminghttp 
 import urllib
 import base64, sys
 import jsonwrap
+try: import simplejson as json
+except ImportError : import json
+
 
 # TODO: multipart:
 # http://atlee.ca/software/poster/index.html
@@ -11,8 +13,7 @@ import jsonwrap
 # http://code.activestate.com/recipes/146306-http-client-to-post-using-multipartform-data/
 # http://stackoverflow.com/questions/680305/using-multipartposthandler-to-post-form-data-with-python
 
-try: import simplejson as json
-except ImportError : import json
+poster.streaminghttp.register_openers()
 
 class GeoIQ(object):
     def __init__(self, root="http://geocommons.com/",
@@ -20,9 +21,13 @@ class GeoIQ(object):
 
         self.endpoint = GeoIQEndpoint(root,username,password)
 
-        for tp in GeoIQSvc.__subclasses__():
-            setattr(self, tp.name, tp(self.endpoint))
-            
+
+    @classmethod
+    def regsvc(cls, nm, svc):
+        def getter(self):
+            return svc(self, self.endpoint)
+
+        setattr(cls, nm, property(getter))
 
 class GeoIQEndpoint(object):
     def __init__(self, root, username, password):
@@ -33,19 +38,29 @@ class GeoIQEndpoint(object):
     def add_auth(self,req):
         if self.username is None:
             return req
-        auth = base64.encodeString("%s:%s" % (username,password))[:-1]
+        auth = base64.encodestring("%s:%s" % (self.username,self.password))[:-1]
         req.add_header("Authorization", "Basic %s" % auth)
         return req
 
     def resolve(self, path, verb, data=None):
+        if (data is not None):
+            data = dict( (k,v) for (k,v) in data.iteritems() if v is not None)
+        if (verb == "MULTIPART"): # use poster to do multipart form upload:
+            assert(data is not None)
+            datagen, headers = poster.encode.multipart_encode(data)
+            req = u.Request(self.root + path, datagen, headers)
+            return self.add_auth(req)
+
         req = u.Request(self.root + path, data)
         req.get_method = lambda: verb
-        print("Request " + verb +":" + self.root + path)
+        print("Request " + verb +":" + self.root + path) # TODO logging
         return self.add_auth(req)
     
+
 class GeoIQSvc(object):
-    def __init__(self, endpoint):
+    def __init__(self, geoiq, endpoint):
         self.endpoint = endpoint
+        self.geoiq = geoiq
 
     def get_entity(self,json):
         raise NotImplementedError()
@@ -55,31 +70,41 @@ class GeoIQSvc(object):
 
         return cls.map(json, self)
 
-
     def unwrapper(self, r):
         return self.generate_entity(r)
 
-    def url(self, p, obj):
-        return (p.format(**url_dict(getattr(obj, 'props', obj))))
+    def url(self,p,**kargs):
+        return p.format(**url_dict(kargs))
 
-    def do_req(self, path, verb, obj, unwrapper=None):
+    def obj_url(self, p, obj):
+        return self.url(p, **obj.props)
+
+    def do_req(self, path, verb, postdata, unwrapper=None, parser=json.load):
         if unwrapper is None: unwrapper = self.unwrapper
-        if (obj):
-            obj = json.dumps(obj.props)
         
-        req = self.endpoint.resolve(path, verb, obj)
+        req = self.endpoint.resolve(path, verb, postdata)
         
         # TODO Error handling
-        res = json.load(u.urlopen(req))
+        res = parser(u.urlopen(req))
         fin = unwrapper(res)
 
         return fin,res
 
     def get_by_id(self, geoiqid):
-        pass
+        fin, res = self.do_req(self.url(self.__class__.by_id_url,
+                                        id=geoiqid),
+                               "GET",
+                               None)
+        return fin
     
+    def refresh(self, obj):
+        assert(obj.geoiq_id is not None)
+        c = self.get_by_id(obj.geoiq_id)
+        obj.props = c.props
+        return obj
+
     def create(self):
-        pass
+        return self.get_entity(None)(None,self)
     
     def delete(self, obj):
         pass
@@ -95,25 +120,35 @@ class GeoIQObj(jsonwrap.JsonWrappedObj):
     Base class for GeoIQ's RESTful entities (things with an ID)
     """
 
-
     @classmethod
     def is_ro(cls): return False
 
-    def __init__(self, props, svc = None):
-        jsonwrap.JsonMappedObj.__init__(self,props)
+    def __init__(self, props,svc):
+        if props is None:
+            props = {"id":None}
+            self.__new = True
+        else:
+            self.__new = False
+
+        jsonwrap.JsonWrappedObj.__init__(self,props)
         self.svc = svc
-        assert(self.geoiq_id is not None)
+        self.geoiq = svc.geoiq
+        
+        assert(self.__new or self.geoiq_id is not None)
+
+    def is_new(self):
+        return self.__new
 
     def refresh(self, lose_mods=False):
         if self.dirty() and not lose_mods:
             raise RuntimeError("Refreshing a dirty object")
     
-        self.props = self.__class__.service.get_by_id(self.geoiq_id).props
-        self.isdirty = false
+        self.props = self.svc.get_by_id(self.geoiq_id).props
+        self.isdirty = False
         return self
 
     def save(self):
-        pass
+        return self.svc.update(self)
     
     def delete(self):
         pass
