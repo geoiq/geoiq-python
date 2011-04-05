@@ -75,6 +75,8 @@ RAWFILETYPES=[ [".shp",".dbf",".shx",".prj"],
 
 
 class Dataset(geoiq.GeoIQObj):
+    writeable = True
+
     FILETYPES= dict( itertools.chain( * (( (x[0],x[1:]) for x in itertools.permutations(entry) ) for entry in RAWFILETYPES  )) )
 
     def set_upload(self, path):

@@ -107,7 +107,15 @@ class GeoIQSvc(object):
         return self.get_entity(None)(None,self)
     
     def delete(self, obj):
-        pass
+        def ident(x): return x
+        fin,res = self.do_req(self.url(self.__class__.by_id_url,
+                                       id=obj.geoiq_id),
+                              "DELETE",
+                              None,
+                              unwrapper=ident,
+                              parser=ident)
+
+        return fin,res
 
     def update(self, obj):
         pass
@@ -151,6 +159,6 @@ class GeoIQObj(jsonwrap.JsonWrappedObj):
         return self.svc.update(self)
     
     def delete(self):
-        pass
+        return self.svc.delete(self)
 
 jsonwrap.props(GeoIQObj,geoiq_id={'ro':True, 'mapto':'id'})
