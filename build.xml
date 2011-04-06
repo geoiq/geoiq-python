@@ -36,10 +36,14 @@
       <arg value="develop"/>
     </py-run>
 
-    <!-- and, let's install shapely: -->
+    <!-- and, let's install shapely (for testing) & ipython (for dev): -->
     <py-run script="${venv}/bin/easy_install"
 	    python="${python.exec}">
       <arg value="shapely"/>
+    </py-run>
+    <py-run script="${venv}/bin/easy_install"
+	    python="${python.exec}">
+      <arg value="ipython"/>
     </py-run>
 
   </target>
