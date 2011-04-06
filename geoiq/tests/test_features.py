@@ -50,7 +50,6 @@ class TestFeatures(ut.TestCase):
             return (list(p[0]),list(p[1:]))
         self.wkb_roundtrip(self.multi(p, shapely.geometry.MultiPolygon))
 
-
     def wkb_roundtrip(self, geom):
         # Test our WKB parsing by round-tripping through Shapely
         s = geom.wkb
@@ -83,7 +82,7 @@ class TestFeatures(ut.TestCase):
 
     def multi(self, inner, shply_class):
         # Note: I believe Shapely's multilinestring constructor bugs on c=1.
-        c = random.randint(2,15)
+        c = random.randint(1,15)
         geoms = [ inner() for x in range(c) ]
         return shply_class(geoms)
 

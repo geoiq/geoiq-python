@@ -1,0 +1,48 @@
+<?xml version='1.0'?>
+
+<project name="python-geoiq" default="unit_tests">
+  
+  <property name="venv" value="${basedir}/scratch/venv-geoiq"/>
+  <property name="python.exec" value="${venv}/bin/python"/>
+
+  <!-- Unit tests -->
+  <target name="unit_tests" depends='venv'>
+    <!-- TODO: http://pypi.python.org/pypi/XmlTestRunner/ or similar? -->
+    <py-run script="${basedir}/geoiq/tests/unittests.py"
+	    python="${python.exec}"/>
+
+  </target>
+
+
+  <!-- python tasks for ant -->
+  <path id="python.tasks.classpath">
+    <pathelement location="${basedir}/bin/pyAntTasks-1.3.3.jar"/>
+  </path>
+  <taskdef 
+      resource="pyAntTasks.properties" 
+      classpathref="python.tasks.classpath"/>
+
+  <!-- Virtualenv setup: -->
+  <available file="${basedir}/scratch/venv-geoiq" property="have-venv"/>
+  <target name="venv" unless="have-venv">
+    <py-run script="${basedir}/bin/make-venv.py">
+      <arg value="--no-site-packages"/>
+      <arg value="${venv}"/>
+    </py-run>
+    
+    <!-- have venv, now get the package to develop mode -->
+    <py-run script="${basedir}/setup.py"
+	    python="${python.exec}">
+      <arg value="develop"/>
+    </py-run>
+
+    <!-- and, let's install shapely: -->
+    <py-run script="${venv}/bin/easy_install"
+	    python="${python.exec}">
+      <arg value="shapely"/>
+    </py-run>
+
+  </target>
+
+
+</project>

@@ -9,7 +9,7 @@ Feature = features.Feature
 try:
     import shapely_features
 except ImportError:
-    print("shapely unavailable")
+    pass
     
 # TODO: 
 # import arc_features

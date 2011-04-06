@@ -1,0 +1,13 @@
+simplejson: https://github.com/simplejson/simplejson
+  BSD, used in: geoiq.py, jsonwrap.py.
+
+poster: http://atlee.ca/software/poster/
+  MIT, used in: geoiq.py
+  
+pyanttasks (optional): http://code.google.com/p/pyanttasks/
+  Apache 2.0, used in: build.xml
+
+Shapely (optional): http://trac.gispython.org/lab/wiki/Shapely
+  BSD, used in:
+    features/shapely_features.py
+    test/test_features.py
