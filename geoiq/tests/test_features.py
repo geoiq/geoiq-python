@@ -15,7 +15,10 @@ class repeated(object):
         return r
 
 class TestFeatures(ut.TestCase):
-    
+    """
+    For now, mostly just integration tests that ensure that WKB parsing into
+    shapely is compatible with the WKB that shapely generates.
+    """
     @repeated(1000)
     def test_point_roundtrip(self):
         self.wkb_roundtrip(shapely.geometry.Point(*self.point()))
@@ -36,6 +39,17 @@ class TestFeatures(ut.TestCase):
     def test_multipoint_roundtrip(self):
         self.wkb_roundtrip(self.multi(self.point, shapely.geometry.MultiPoint))
                     
+    @repeated(100)
+    def test_multilinestring_roundtrip(self):
+        self.wkb_roundtrip(self.multi(self.line_ring, shapely.geometry.MultiLineString))
+
+    @repeated(50)
+    def test_multipolygon_roundtrip(self):
+        def p(): 
+            p = self.poly()
+            return (list(p[0]),list(p[1:]))
+        self.wkb_roundtrip(self.multi(p, shapely.geometry.MultiPolygon))
+
 
     def wkb_roundtrip(self, geom):
         # Test our WKB parsing by round-tripping through Shapely
@@ -68,7 +82,8 @@ class TestFeatures(ut.TestCase):
         return parts
 
     def multi(self, inner, shply_class):
-        c = random.randint(1,15)
+        # Note: I believe Shapely's multilinestring constructor bugs on c=1.
+        c = random.randint(2,15)
         geoms = [ inner() for x in range(c) ]
         return shply_class(geoms)
 
