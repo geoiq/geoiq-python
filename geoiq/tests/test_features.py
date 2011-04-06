@@ -28,7 +28,7 @@ class TestFeatures(ut.TestCase):
         points = self.line_ring()
         self.wkb_roundtrip(shapely.geometry.LineString(points))
 
-    @repeated(100)
+    @repeated(20)
     def test_polygon_roundtrip(self):
         parts = self.poly()
         hd = parts[0]
@@ -43,7 +43,7 @@ class TestFeatures(ut.TestCase):
     def test_multilinestring_roundtrip(self):
         self.wkb_roundtrip(self.multi(self.line_ring, shapely.geometry.MultiLineString))
 
-    @repeated(50)
+    @repeated(20)
     def test_multipolygon_roundtrip(self):
         def p(): 
             p = self.poly()
