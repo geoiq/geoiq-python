@@ -133,7 +133,7 @@ class Dataset(geoiq.GeoIQObj):
 jsonwrap.props(Dataset,
                "title",
                "description",
-               "tags",
+               "tags", # TODO: needs mapping
                "published",
                "data_type",
                "feature_count",

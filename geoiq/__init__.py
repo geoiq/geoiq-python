@@ -1,3 +1,5 @@
 __all__ = []
-import geoiq,geoiq,search
+
+import geoiq,search,dataset,map
+
 GeoIQ=geoiq.GeoIQ

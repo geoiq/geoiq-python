@@ -182,6 +182,7 @@ class GeoIQObj(jsonwrap.JsonWrappedObj):
     def save(self):
         r = self.svc.update(self)
         if r:
+            self.__new = False
             self.isdirty = False
         return r
 
