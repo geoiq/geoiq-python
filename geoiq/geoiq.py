@@ -29,6 +29,8 @@ class GeoIQ(object):
 
         setattr(cls, nm, property(getter))
 
+def ident(x): return x
+
 class GeoIQEndpoint(object):
     def __init__(self, root, username, password):
         self.root = root
@@ -43,17 +45,23 @@ class GeoIQEndpoint(object):
         return req
 
     def resolve(self, path, verb, data=None):
+        # Filter out nulls
         if (data is not None):
             data = dict( (k,v) for (k,v) in data.iteritems() if v is not None)
+
         if (verb == "MULTIPART"): # use poster to do multipart form upload:
             assert(data is not None)
             datagen, headers = poster.encode.multipart_encode(data)
             req = u.Request(self.root + path, datagen, headers)
             return self.add_auth(req)
 
+        # if post data is key-value pairs:
+        if (data is not None):
+            data = urllib.urlencode(data)
+            
+
         req = u.Request(self.root + path, data)
         req.get_method = lambda: verb
-        print("Request " + verb +":" + self.root + path) # TODO logging
         return self.add_auth(req)
     
 
@@ -79,16 +87,20 @@ class GeoIQSvc(object):
     def obj_url(self, p, obj):
         return self.url(p, **obj.props)
 
+    def raw_req(self,path,verb,postdata):
+        return self.do_req(path,verb,postdata,unwrapper=ident,parser=ident)
+
+
     def do_req(self, path, verb, postdata, unwrapper=None, parser=json.load):
         if unwrapper is None: unwrapper = self.unwrapper
         
         req = self.endpoint.resolve(path, verb, postdata)
         
-        # TODO Error handling
+        # TODO error handling
         res = parser(u.urlopen(req))
         fin = unwrapper(res)
-
         return fin,res
+
 
     def get_by_id(self, geoiqid):
         fin, res = self.do_req(self.url(self.__class__.by_id_url,
@@ -107,7 +119,6 @@ class GeoIQSvc(object):
         return self.get_entity(None)(None,self)
     
     def delete(self, obj):
-        def ident(x): return x
         fin,res = self.do_req(self.url(self.__class__.by_id_url,
                                        id=obj.geoiq_id),
                               "DELETE",
@@ -117,8 +128,21 @@ class GeoIQSvc(object):
 
         return fin,res
 
+    def update_new(self,obj):
+        fin,res = self.do_req(self.url(self.__class__.create_url),
+                              "POST",
+                              obj.unmap())
+        obj.props = fin.props
+        return obj
+
     def update(self, obj):
-        pass
+        if (obj.is_new()):
+            return self.update_new(obj)
+        fin,res = self.raw_req(self.url(self.__class__.by_id_url,
+                                        id=obj.geoiq_id),
+                               "PUT",
+                               obj.unmap())
+        return obj
 
 def url_dict(d):
     return dict( ((k,urllib.quote(str(v))) for (k,v) in d.iteritems()) )
@@ -156,9 +180,15 @@ class GeoIQObj(jsonwrap.JsonWrappedObj):
         return self
 
     def save(self):
-        return self.svc.update(self)
-    
+        r = self.svc.update(self)
+        if r:
+            self.isdirty = False
+        return r
+
     def delete(self):
-        return self.svc.delete(self)
+        r = self.svc.delete(self)
+        self.props = None
+        self.svc = None
+        return r
 
 jsonwrap.props(GeoIQObj,geoiq_id={'ro':True, 'mapto':'id'})

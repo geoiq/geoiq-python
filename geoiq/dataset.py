@@ -2,11 +2,15 @@
 import geoiq, jsonwrap
 import urlparse, os.path
 import itertools
+
+import features
+
 class DatasetSvc(geoiq.GeoIQSvc):
     by_id_url = "datasets/{id}.json?include_features=0"
     create_url = "datasets.json"
     update_feed_url = "datasets/{id}/fetch.json"
-    
+    features_url = "datasets/{id}/features.json?start={start}&limit={limit}&hex_geometry=1"
+
     def get_entity(self,json):
         return Dataset
 
@@ -24,30 +28,45 @@ class DatasetSvc(geoiq.GeoIQSvc):
         ds.set_upload(path_or_url)
         return ds
 
+    def features(self, ds, start=0,limit = None, per_req=30):
+        if limit is None:
+            limit = ds.feature_count
+
+        gen = jsonwrap.wrap_many(features.Feature.map)
+
+        sofar = 0
+        while sofar < limit:
+            if (sofar + per_req) >= limit:
+                per_req = limit - sofar
+
+            u = self.url(self.__class__.features_url, start=sofar, limit=per_req, id=ds.geoiq_id)
+            fin,res = self.do_req(u, "GET", None, unwrapper=gen)
+            for f in fin:
+                sofar+=1
+                yield f
+
+
 
     def request_feed_update(self, ds):
-        u = self.url(update_feed_url, ds)
+        u = self.url(update_feed_url, **ds.unmap())
         r,_ = self.do_req(u, "GET", None, lambda x : x)
         return r
-    
-    def update(self, ds):
-        if (ds.is_new()):
-            return self.upload(ds, ds.uploads)
-        else:
-            return geoiq.GeoIQSvc.update(self,ds)
 
-    def upload(self, dataset, files):
-        post = dict( ("dataset[" + k[1:] + "]", open(v,'r')) for (k,v) in files.iteritems())
-        post.update(dataset.props)
+    def update_new(self,dataset):
+        # Dataset creation is funny -- returns result as a URL in a header,
+        #   body is useless (to us) HTML.
+        # Override creation with one that deals w/ the w
 
-        # Do the request with no parsing/unwrapping -- the result is
-        #  a big html/xml page; but there's a pointer to the final JSON
-        #  in the 'location' header coming back from the server.
-        def nop(x): return x
-
-        r,f = self.do_req(DatasetSvc.create_url, "MULTIPART",post, 
-                          unwrapper=nop, parser=nop)
+        method = "POST"
+        post = dataset.unmap()
         
+        if dataset.uploads is not None: # switch to multipart & add files:
+            files = dataset.uploads
+            post.update(dict( ("dataset[" + k[1:] + "]", open(v,'r')) for (k,v) in files.iteritems()))
+            method = "MULTIPART"
+
+        r,f = self.raw_req(DatasetSvc.create_url, method, post)
+
         fin_loc = r.info()["location"]
 
         assert(fin_loc is not None), "Didn't get a location back from server on multipart/post?"
@@ -64,6 +83,7 @@ class DatasetSvc(geoiq.GeoIQSvc):
         dataset.refresh(True)
 
         return dataset
+
 
 geoiq.GeoIQ.regsvc("datasets", DatasetSvc)
 
@@ -86,6 +106,7 @@ class Dataset(geoiq.GeoIQObj):
             p.scheme == 'https'):
             self.uploads = None
             self.link = path
+            self.props['url'] = path
             return
 
         if not (os.path.exists(path)): raise ValueError("File must exist: " + path)
@@ -105,6 +126,9 @@ class Dataset(geoiq.GeoIQObj):
     
     def request_feed_update(self):
         service.request_feed_update(self)
+
+    def features(self, start=0,limit=None, per_req=30):
+        return self.svc.features(self, start, limit, per_req)
 
 jsonwrap.props(Dataset,
                "title",
