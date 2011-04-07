@@ -7,11 +7,6 @@ try: import simplejson as json
 except ImportError : import json
 
 
-# TODO: multipart:
-# http://atlee.ca/software/poster/index.html
-
-# http://code.activestate.com/recipes/146306-http-client-to-post-using-multipartform-data/
-# http://stackoverflow.com/questions/680305/using-multipartposthandler-to-post-form-data-with-python
 
 poster.streaminghttp.register_openers()
 
@@ -101,8 +96,15 @@ class GeoIQSvc(object):
         
         req = self.endpoint.resolve(path, verb, postdata)
         
-        # TODO error handling
-        res = parser(u.urlopen(req))
+        # TODO tracing..
+        try:
+            v = u.urlopen(req)
+        except u.HTTPError,e:
+            handled,res = self.handle_error(e)
+            if (handled): return (res,e)
+            raise
+
+        res = parser(v)
         fin = unwrapper(res)
         return fin,res
 
@@ -149,8 +151,19 @@ class GeoIQSvc(object):
                                obj.unmap())
         return obj
 
+    def handle_error(self, err):
+        # On 404, return null:
+        if (err.code == 404): return (True, None)
+
+        if (err.code == 401): raise GeoIQAccessDenied(err.read())
+
+        return (False,None)
+
 def url_dict(d):
     return dict( ((k,urllib.quote(str(v))) for (k,v) in d.iteritems()) )
+
+class GeoIQAccessDenied(Exception):
+    pass
 
 class GeoIQObj(jsonwrap.JsonWrappedObj):
     """

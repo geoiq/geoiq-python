@@ -6,11 +6,18 @@ class SearchSvc(geoiq.GeoIQSvc):
     def get_entity(self,json):
         return SearchPage
 
-    def search(self,request,per_page=50,model=None,page_limit=float('inf'),bbox=None):
+    def search(self,request,
+               start_page=0,
+               per_page=50,
+               model=None,
+               page_limit=float('inf'),
+               bbox=None):
         if model is not None:
             def might_be(x, *xs):
                 for xx in xs:
-                    if (isinstance(x,xx) or x is xx): return True
+                    try: 
+                        if (x is xx or isinstance(x,xx) ): return True
+                    except TypeError: pass
                 return False
 
             if (might_be(model, dataset, dataset.Dataset, dataset.DatasetSvc)):
@@ -22,20 +29,20 @@ class SearchSvc(geoiq.GeoIQSvc):
             bbox = ",".join( ("%f" % x) for x in bbox )
 
         c = 0
-        curpage = 0
+        curpage = start_page
         total = 1
-
-        while (curpage < page_limit and c < total):
+        fin_page = start_page + page_limit
+        while (curpage < fin_page and c < total):
             o = {
                 'query':request,
-                'curpage':curpage,
+                'page':curpage,
                 'limit':per_page,
                 'model': model,
                 'bbox' : bbox
                 }
 
             u = self.url("search.json", query=o)
-
+            print("Search url:" + u)
             fin,res = self.do_req(u, "GET", None)
             c += fin.itemsPerPage
             curpage += 1
@@ -53,21 +60,21 @@ class SearchPointer(jsonwrap.JsonWrappedObj):
         jsonwrap.JsonWrappedObj.__init__(self, props)
         self.svc = svc
         self.geoiq = svc.geoiq
-        self.tp = self.id.split(":")[0]
+
+        self.tp,self.key = self.id.split(":")
+        self.key = int(self.key)
 
     def load(self):
-        tp,key = self.id.split(":")
-        
         loader = {
             "Dataset":self.geoiq.datasets.get_by_id,
             "Map":self.geoiq.maps.get_by_id,
             "Overlay":self.geoiq.datasets.get_by_id
-            }.get(tp)
+            }.get(self.tp)
         
         if (loader is None):
             raise NotImplementedError("No implementation for: " + tp + "yet.")
         
-        return loader(key)
+        return loader(self.key)
 
 
 jsonwrap.props(SearchPointer,
