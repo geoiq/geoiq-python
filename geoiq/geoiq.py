@@ -81,8 +81,13 @@ class GeoIQSvc(object):
     def unwrapper(self, r):
         return self.generate_entity(r)
 
-    def url(self,p,**kargs):
-        return p.format(**url_dict(kargs))
+    def url(self,p,query=None,**kargs):
+        if (query is not None):
+            if (hasattr(query, '__getitem__')):
+                query = urllib.urlencode(dict( (k,v) for (k,v) in query.iteritems() if v is not None) )
+                query = "?" + query
+        if query is None: query = ""
+        return p.format(**url_dict(kargs)) + query
 
     def obj_url(self, p, obj):
         return self.url(p, **obj.props)
