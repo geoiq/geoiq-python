@@ -8,7 +8,7 @@
   <!-- Unit tests -->
   <target name="unit_tests" depends='venv'>
     <!-- TODO: http://pypi.python.org/pypi/XmlTestRunner/ or similar? -->
-    <py-run script="${basedir}/geoiq/tests/unittests.py"
+    <py-run script="${basedir}/geoiq/tests/unit/suite.py"
 	    python="${python.exec}"/>
 
   </target>

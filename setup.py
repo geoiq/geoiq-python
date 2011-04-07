@@ -11,7 +11,7 @@ setup(
     author = "TODO",
     author_email = "TODO",
     url="TODO",
-    test_suite = "geoiq.tests.unittests",
+    test_suite = "geoiq.tests.unit.suite",
     install_requires = ["simplejson","poster"],
     long_description = """\
 GeoIQ Rest API for Python.

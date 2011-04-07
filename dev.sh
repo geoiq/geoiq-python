@@ -5,10 +5,7 @@
 
 mkdir -p scratch
 if [ ! -e scratch/venv-geoiq ]; then
-    virtualenv --no-site-packages scratch/venv-geoiq
-    scratch/venv-geoiq/bin/python setup.py develop
-    scratch/venv-geoiq/bin/easy_install ipython
-    scratch/venv-geoiq/bin/easy_install shapely
+    ant venv
 fi
 
 OLD_PS1="$PS1"
