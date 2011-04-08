@@ -4,7 +4,7 @@ __all__ = [ "GeoIQFuncTest" ]
 
 import functesting
 import geoiq
-import unittest, os, os.path, random
+import unittest, os, os.path, random, tempfile
 
 try:
     import simplejson as json
@@ -75,6 +75,18 @@ class GeoIQTestConf(object):
 
 class GeoIQFuncTest(functesting.FuncTest, GeoIQSteps):
     def setUp(self):
-        self.conf = GeoIQTestConf()
-        self.geoiq = self.conf.geoiq
-        self.geocommons = self.conf.geocommons
+        c = GeoIQTestConf()
+        self.geoiq = c.geoiq
+        self.geocommons = c.geocommons
+        self.conf = c.conf
+
+
+
+    def working_folder(self):
+        scratch = self.conf.get("workdir","scratch")
+        td = tempfile.mkdtemp(dir=scratch,suffix=".wkdir")
+        
+        # TODO: register for cleanup?
+        
+        return td
+        

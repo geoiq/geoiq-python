@@ -1,6 +1,6 @@
 
 import geoiq, jsonwrap
-import urlparse, os.path
+import urlparse, os.path, tempfile, zipfile
 import itertools
 
 import features
@@ -23,7 +23,6 @@ class DatasetSvc(geoiq.GeoIQSvc):
            the others (.prj, .dbf, .shx) will also be uploaded.
 
         """
-
         ds = Dataset(None, self)
         ds.set_upload(path_or_url)
         return ds
@@ -45,7 +44,16 @@ class DatasetSvc(geoiq.GeoIQSvc):
                 sofar+=1
                 yield f
 
-
+    def open_stream(self, ds, format="zip"):
+        supported = ["zip","kml", "csv"]
+        if not format in supported:
+            raise ValueError("Unsupported format; must be one of [%s]" % (",".join(supported)))
+        
+        u = self.url("datasets/{id}.{format}", 
+                     id=ds.geoiq_id,
+                     format=format)
+        fin, stream = self.raw_req(u, "GET", None)
+        return stream
 
     def request_feed_update(self, ds):
         u = self.url(update_feed_url, **ds.unmap())
@@ -92,7 +100,7 @@ RAWFILETYPES=[ [".shp",".dbf",".shx",".prj"],
                [".rss"],
                [".kmz"],
                [".climgen"] ]
-
+OPTIONAL_TYPES=[ ".prj" ] # FIXME a bit of a hack
 
 class Dataset(geoiq.GeoIQObj):
     writeable = True
@@ -100,6 +108,8 @@ class Dataset(geoiq.GeoIQObj):
     FILETYPES= dict( itertools.chain( * (( (x[0],x[1:]) for x in itertools.permutations(entry) ) for entry in RAWFILETYPES  )) )
 
     def set_upload(self, path):
+        global OPTIONAL_TYPES
+
         assert(self.is_new())
         p = urlparse.urlparse(path)
         if (p.scheme == 'http' or
@@ -117,18 +127,65 @@ class Dataset(geoiq.GeoIQObj):
         if not (more is not None): raise ValueError("Unsupported filetype")
         extensions = [ext] + list(more)
         
-        # TODO: technically, the .prj shouldn't be mandatory
+        fin_extensions = []
         for ext in extensions:
             if not (os.path.exists(base+ext)):
-                raise ValueError("Missing layer component: " + base + ext)
+                if ext not in OPTIONAL_TYPES:
+                    raise ValueError("Missing layer component: " + base + ext)
+            else:
+                fin_extensions.append(ext)
 
-        self.uploads=dict( (ext,base+ext) for ext in extensions )
+        self.uploads=dict( (ext,base+ext) for ext in fin_extensions )
     
     def request_feed_update(self):
         service.request_feed_update(self)
 
     def features(self, start=0,limit=None, per_req=30):
         return self.svc.features(self, start, limit, per_req)
+
+    def open_stream(self, format="zip"):
+        return self.svc.open_stream(self, format)
+
+    def download_shapefile(self, folder, work_folder=None):
+        if not os.path.isdir(folder):
+            raise ValueError("Folder must exist")
+        
+        if work_folder is not None and not os.path.isdir(work_folder):
+            raise ValueError("Work folder must exist (if given)")
+
+        outfile = tempfile.NamedTemporaryFile(
+            suffix=".zip",
+            delete=False,
+            dir=work_folder)
+
+        out_path = outfile.name
+
+        dl = self.open_stream("zip")
+        while True:
+            dat = dl.read(4096)
+            if (dat == ""):
+                break
+            outfile.write(dat)
+        dl.close()
+        outfile.close()
+        
+        if not zipfile.is_zipfile(out_path):
+            raise ValueError("Download failed or corruption?")
+        
+        zipf = zipfile.ZipFile(out_path)
+        zipf.extractall(folder)
+        nms = [ os.path.abspath(os.path.join(folder,nm)) 
+                for nm in zipf.namelist() ]
+        
+        shp = None
+        for nm in nms:
+            if (nm.lower().endswith(".shp")):
+                shp = nm
+            assert(os.path.exists(nm))
+
+        zipf.close()
+
+        return (shp,nms)
 
 jsonwrap.props(Dataset,
                "title",
@@ -137,5 +194,9 @@ jsonwrap.props(Dataset,
                "published",
                "data_type",
                "feature_count",
-               "link")
+               "author",
+               "source",
+               link={"ro":True},
+               contributor={"ro":True},
+               published={"ro":True})
                

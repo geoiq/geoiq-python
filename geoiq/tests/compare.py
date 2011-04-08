@@ -1,5 +1,6 @@
 
-import difflib
+import difflib, sys
+__all__ = [ "DeepCompare" ]
 
 class DeepIter(object):
     def run(self, sub):
@@ -56,7 +57,7 @@ class DeepCompare(object):
                 b_idx = j + l
         return (match, list(map_matches(results)))
 
-    def pprint(self,resmap, full_ok=True):
+    def pprint(self,resmap, full_ok=True, outp=sys.stdout):
         def green(x):
             return ("\033[92m%s\033[0m" % x)
         def red(x):
@@ -65,13 +66,13 @@ class DeepCompare(object):
         for r in resmap:
             if ("same" in r):
                 if not full_ok:
-                    print(green("same: ") + ("(%d)" % len(r["same"])))
+                    outp.write("%s %d\n" % (green("same : "), len(r["same"])))
                     continue
                 for v in r["same"]:
-                    print("%s: %s" % (green("same: "), repr(v)))
+                    outp.write("%s %s\n" % (green("same : "), repr(v)))
             else:
                 for va,vb in r["diff"]:
-                    print("%s: %s -- %s" % (red("diff: "), repr(va),repr(vb)))
+                    outp.write("%s %s -- %s\n" % (red("diff : "), repr(va),repr(vb)))
 
 
     def get_iters(self, a, b):
