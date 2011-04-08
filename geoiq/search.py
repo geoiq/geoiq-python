@@ -1,4 +1,4 @@
-import geoiq, jsonwrap, dataset, map
+import geoiq, util.jsonwrap as jsonwrap, dataset, map
 
 class SearchSvc(geoiq.GeoIQSvc):
     name="search"
@@ -96,4 +96,4 @@ jsonwrap.props(SearchPage,
                "totalResults",
                "itemsPerPage",
                entries={ "ro":True, 
-                         "map_in": jsonwrap.wrap_many(SearchPointer) })
+                         "map": jsonwrap.map_many(SearchPointer) })

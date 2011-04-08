@@ -1,4 +1,4 @@
-import geoiq.jsonwrap as jw
+import geoiq.util.jsonwrap as jw
 import unittest as ut
 
 
@@ -33,20 +33,20 @@ class TestJsonWrapProps(ut.TestCase):
             writeable = True
             pass
 
-        def innie(x):
-            return "in_" + x
+        class Wrapper(object):
+            @classmethod
+            def map(c,x):
+                return "in_" + x
 
-        def outie(x):
-            return x[len("in_"):]
+            @classmethod
+            def unmap(c,x):
+                return x[len("in_"):]
 
         jw.props(Foo, 
                  a={
                  "ro": True
                 },
-                 b={
-                 "map_in" : innie,
-                 "map_out" : outie
-                },
+                 b={ "map" : Wrapper },
                  d={
                 "mapto" : "c"
                 })
@@ -63,8 +63,10 @@ class TestJsonWrapProps(ut.TestCase):
         f = Foo.map({"b":"hello"})
         self.assertEquals(f.b, "in_hello")
         f.b="in_goodbye"
-        p = f.unmap()
+        p = f.to_json_obj()
 
         self.assertEquals(p["b"], "goodbye")
 
         
+if (__name__ == "__main__"):
+    ut.main()

@@ -1,7 +1,6 @@
 
 # Internal utility classes to make mapping to/from JSON web services easier
 
-
 class JsonWrappedObj(object):
     """
     Base for objects mapped in from JSON.
@@ -20,6 +19,9 @@ class JsonWrappedObj(object):
                 if pname in other.props: self.props[pname] = other.props[pname]
         return self
 
+    def to_json_obj(self):
+        return self.__class__.unmap(self)
+    
     @classmethod
     def map(cls,json, *args, **kwargs):
         """
@@ -27,41 +29,56 @@ class JsonWrappedObj(object):
         """
         mapping = cls.mappings
         
-        def id(x,*args, **kwargs): return x
-
+        def map_in(mapper,v):
+            if mapper is None: return v
+            else: return mapper.map(v, *args, **kwargs)
+        
         njson = dict(
-            (k,mapping.get(k,{}).get('in', id)(v, *args,**kwargs))
+            (k,map_in(mapping.get(k,{}).get('mapper'), v))
             for (k,v) in json.iteritems()
             )
 
         return cls(njson, *args, **kwargs)
 
-    def unmap(self, *args, **kwargs):
+    @classmethod
+    def unmap(cls, obj, *args, **kwargs):
         """
-        Converts this to a bare dict for JSON, applying mappings along the way
+        Converts this to a bare dict for JSON, applying mappings along the way.
+        Only explicitly-defined props are unmapped.
         """
-        mapping = self.__class__.mappings
-        def id(x,*args,**kargs):return x
+        mapping = cls.mappings
+
+        def map_out(mapper,v):
+            if mapper is None: return v
+            else: return mapper.unmap(v, *args, **kwargs)
+
+        itms = ( (k,v) for (k,v) in obj.props.iteritems() if k in mapping )
+
         return dict(
-            (k, mapping.get(k,{}).get('out', id)(v, *args, **kwargs))
-            for (k,v) in self.props.iteritems()
+            (k,map_out(mapping[k].get('mapper'),v))
+            for (k,v) in itms
             )
 
     @classmethod
     def is_readonly(cls):
         return not getattr(cls,"writeable",False)
 
-def wrap_many(inner):
-    def r(ps, *args, **kargs):
-        return [ inner(p,*args,**kargs) for p in ps ]
-    return r
+class map_many(object):
+    def __init__(self, inner):
+        self.inner = inner
+
+    def map(self,ps, *args, **kargs):
+        return [ self.inner.map(p,*args,**kargs) for p in ps ]
+    
+    def unmap(self,ps, *args, **kargs):
+        return [ self.inner.unmap(p, *ags, **kargs) for p in ps ]
 
 def props(cls, *simple,**specs):
     """\
     Define properties mapped to the underlying json.
     
     Normal arguments get a simple read/write property.
-    Keyword arguments: { ro:True, map_in:in_map_fn, map_out:out_map_fn}
+    Keyword arguments: { ro:True, map:<object with .map and .unmap attrs> }
     (all optional)
     """
 
@@ -100,8 +117,5 @@ def props(cls, *simple,**specs):
                ro_def or attrs.get('ro', False), 
                attrs.get('mapto', nm))
         cls.mappings[nm] = { "ro" : ro_def or attrs.get('ro',False) }
-        if "map_in" in attrs:
-            cls.mappings[nm]["in"] = attrs["map_in"]
-        if "map_out" in attrs:
-            cls.mappings[nm]["out"] = attrs["map_out"]
-
+        if "map" in attrs:
+            cls.mappings[nm]["mapper"] = attrs["map"]

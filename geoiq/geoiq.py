@@ -1,11 +1,13 @@
 
 import urllib2 as u, poster.encode, poster.streaminghttp 
-import urllib
+
 import base64, sys
-import jsonwrap
+import util.jsonwrap as jsonwrap
+
 try: import simplejson as json
 except ImportError : import json
 
+from util.protocol import *
 
 
 poster.streaminghttp.register_openers()
@@ -42,7 +44,7 @@ class GeoIQEndpoint(object):
     def resolve(self, path, verb, data=None):
         # Filter out nulls
         if (data is not None):
-            data = dict( (k,v) for (k,v) in data.iteritems() if v is not None)
+            data = obj_to_railsparams(data)
 
         if (verb == "MULTIPART"): # use poster to do multipart form upload:
             assert(data is not None)
@@ -52,8 +54,7 @@ class GeoIQEndpoint(object):
 
         # if post data is key-value pairs:
         if (data is not None):
-            data = urllib.urlencode(data)
-            
+            data = urlencode_params(data)
 
         req = u.Request(self.root + path, data)
         req.get_method = lambda: verb
@@ -79,10 +80,11 @@ class GeoIQSvc(object):
     def url(self,p,query=None,**kargs):
         if (query is not None):
             if (hasattr(query, '__getitem__')):
-                query = urllib.urlencode(dict( (k,v) for (k,v) in query.iteritems() if v is not None) )
+                query = urlencode_params(query)
                 query = "?" + query
+
         if query is None: query = ""
-        return p.format(**url_dict(kargs)) + query
+        return p.format(**urlencode_dictvals(kargs)) + query
 
     def obj_url(self, p, obj):
         return self.url(p, **obj.props)
@@ -138,7 +140,7 @@ class GeoIQSvc(object):
     def update_new(self,obj):
         fin,res = self.do_req(self.url(self.__class__.create_url),
                               "POST",
-                              obj.unmap())
+                              obj.to_json_obj())
         obj.props = fin.props
         return obj
 
@@ -148,7 +150,7 @@ class GeoIQSvc(object):
         fin,res = self.raw_req(self.url(self.__class__.by_id_url,
                                         id=obj.geoiq_id),
                                "PUT",
-                               obj.unmap())
+                               obj.to_json_obj())
         return obj
 
     def handle_error(self, err):
@@ -158,9 +160,6 @@ class GeoIQSvc(object):
         if (err.code == 401): raise GeoIQAccessDenied(err.read())
 
         return (False,None)
-
-def url_dict(d):
-    return dict( ((k,urllib.quote(str(v))) for (k,v) in d.iteritems()) )
 
 class GeoIQAccessDenied(Exception):
     pass

@@ -30,10 +30,10 @@ class TestDataset(ut.TestCase):
         
         # .. but, with friends, it works.
         tdir = tempfile.mkdtemp()
-        xs = [ '.shp', '.shx', '.prj', '.dbf' ]
-        files = [ os.path.join(tdir,"file" + x) for x in xs ]
+        xs = [ 'shp', 'shx', 'prj', 'dbf' ]
+        files = [ os.path.join(tdir,"file." + x) for x in xs ]
 
-        handles = [ open(f, "w") for f in files ]
+        handles = [ open(f, "w") for f in files ] # force creation
 
         # (doesn't matter which file we point it at; it should find them all)
         dats = [ g.datasets.create(f) for f in files ]

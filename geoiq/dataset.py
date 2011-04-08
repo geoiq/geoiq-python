@@ -1,5 +1,5 @@
 
-import geoiq, jsonwrap
+import geoiq, util.jsonwrap as jsonwrap
 import urlparse, os.path, tempfile, zipfile
 import itertools
 
@@ -31,7 +31,7 @@ class DatasetSvc(geoiq.GeoIQSvc):
         if limit is None:
             limit = ds.feature_count
 
-        gen = jsonwrap.wrap_many(features.Feature.map)
+        gen = jsonwrap.map_many(features.Feature).map
 
         sofar = 0
         while sofar < limit:
@@ -56,7 +56,7 @@ class DatasetSvc(geoiq.GeoIQSvc):
         return stream
 
     def request_feed_update(self, ds):
-        u = self.url(update_feed_url, **ds.unmap())
+        u = self.url(update_feed_url, **ds.to_json_obj())
         r,_ = self.do_req(u, "GET", None, lambda x : x)
         return r
 
@@ -66,11 +66,10 @@ class DatasetSvc(geoiq.GeoIQSvc):
         # Override creation with one that deals w/ the w
 
         method = "POST"
-        post = dataset.unmap()
+        post = dataset.to_json_obj()
         
         if dataset.uploads is not None: # switch to multipart & add files:
-            files = dataset.uploads
-            post.update(dict( ("dataset[" + k[1:] + "]", open(v,'r')) for (k,v) in files.iteritems()))
+            post["dataset"] = dict( (k, open(v,'rb')) for (k,v) in dataset.uploads.iteritems() )
             method = "MULTIPART"
 
         r,f = self.raw_req(DatasetSvc.create_url, method, post)
@@ -135,7 +134,7 @@ class Dataset(geoiq.GeoIQObj):
             else:
                 fin_extensions.append(ext)
 
-        self.uploads=dict( (ext,base+ext) for ext in fin_extensions )
+        self.uploads=dict( (ext[1:],base+ext) for ext in fin_extensions )
     
     def request_feed_update(self):
         service.request_feed_update(self)

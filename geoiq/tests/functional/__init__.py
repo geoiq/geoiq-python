@@ -53,7 +53,7 @@ class GeoIQSteps(object):
                     fail_count += 1
             except geoiq.geoiq.GeoIQAccessDenied,err:
                 fail_count += 1
-                print("Access denied (%d) - %s" % (r, err.message))
+                print("Access denied (%d) - %s" % (r, str(err)))
 
 
 class GeoIQTestConf(object):
