@@ -6,7 +6,27 @@ class SearchSvc(geoiq.GeoIQSvc):
     def get_entity(self,json):
         return SearchPage
 
-    def search(self,request,
+    def search(self, request, model=None, bbox=None, max_results=None):
+        per_page = 50
+        page_limit = None
+        if (max_results is not None):
+            page_limit = (max_results / per_page) + 1
+        
+        totcount = 0
+        for page in self.search_raw(request, per_page=per_page,
+                                 model=model,
+                                 page_limit = page_limit,
+                                 bbox = bbox):
+
+            for r in page.entries:
+                if max_results is not none and (totcount + 1 >= max_results):
+                    break
+
+                yield r
+                totcount += 1
+
+
+    def search_raw(self,request,
                start_page=0,
                per_page=50,
                model=None,
@@ -64,13 +84,26 @@ class SearchPointer(jsonwrap.JsonWrappedObj):
         self.tp,self.key = self.id.split(":")
         self.key = int(self.key)
 
+    # TODO: what kind is it?
+    def is_dataset(self):
+        return {
+            "Dataset" : True,
+            "Overlay" : True,
+            }.get(self.tp, False)
+
+    def is_map(self):
+        return {
+            "Map" : True
+            }.get(self.tp, False)
+
+
     def load(self):
-        loader = {
-            "Dataset":self.geoiq.datasets.get_by_id,
-            "Map":self.geoiq.maps.get_by_id,
-            "Overlay":self.geoiq.datasets.get_by_id
-            }.get(self.tp)
-        
+        loader = None
+        if self.is_dataset():
+            loader = self.geoiq.datasets.get_by_id
+        elif self.is_map():
+            loader = self.geoiq.maps.get_by_id,
+
         if (loader is None):
             raise NotImplementedError("No implementation for: " + tp + "yet.")
         
@@ -82,7 +115,8 @@ jsonwrap.props(SearchPointer,
                "description",
                "type",
                "tags",
-               "author", 
+               "author",
+               "title",
                "id")
 
 

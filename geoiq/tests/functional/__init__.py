@@ -14,7 +14,7 @@ except ImportError:
 class GeoIQSteps(object):
     @functesting.step()
     def search(self,g,*args,**kwargs):
-        return g.search(*args,**kwargs)
+        return g.search.search_raw(*args,**kwargs)
 
     @functesting.step()
     def first_and_last(self,g, *args,**kwargs):
