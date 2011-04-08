@@ -3,16 +3,7 @@ import geoiq.features as features
 import binascii, random
 import shapely.geometry
 import shapely.wkb
-
-class repeated(object):
-    def __init__(self, count):
-        self.count = count
-
-    def __call__(self, f):
-        def r(*args,**kwargs):
-            for x in range(self.count):
-                f(*args,**kwargs)
-        return r
+from geoiq.tests import repeated
 
 class TestFeatures(ut.TestCase):
     """

@@ -1,3 +1,6 @@
+# Ignore the real testconf.json
+testconf.json
+
 # Python packaging artifacts:
 geoiq.egg-info
 build

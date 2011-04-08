@@ -1,14 +1,21 @@
+INSTALL DEPS
+===========
 simplejson: https://github.com/simplejson/simplejson
   BSD, used in: geoiq.py, jsonwrap.py.
 
 poster: http://atlee.ca/software/poster/
   MIT, used in: geoiq.py
-  
-pyanttasks: http://code.google.com/p/pyanttasks/
-  Apache 2.0, used in: build.xml
-  checked in at: bin/pyAntTasks-1.3.3.jar
 
+OPTIONAL (used if present but not auto-installed except on dev)
+======================
 Shapely (optional): http://trac.gispython.org/lab/wiki/Shapely
   BSD, used in:
     features/shapely_features.py
     test/test_features.py
+
+DEV & TESTING DEPS
+==================
+pyanttasks: http://code.google.com/p/pyanttasks/
+  Apache 2.0, used in: build.xml
+  checked in at: bin/pyAntTasks-1.3.3.jar
+
