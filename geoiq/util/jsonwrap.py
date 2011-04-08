@@ -5,7 +5,7 @@ class JsonWrappedObj(object):
     """
     Base for objects mapped in from JSON.
     """
-    def __init__(self, props, *args):
+    def __init__(self, props, *args, **kargs):
         self.props = props
         self.isdirty = False
 
@@ -23,11 +23,15 @@ class JsonWrappedObj(object):
         return self.__class__.unmap(self)
     
     @classmethod
+    def get_mappings(cls):
+        return getattr(cls,"mappings",{})
+
+    @classmethod
     def map(cls,json, *args, **kwargs):
         """
         Constructs an object from JSON, applying mappings along the way.
         """
-        mapping = cls.mappings
+        mapping = cls.get_mappings()
         
         def map_in(mapper,v):
             if mapper is None: return v
@@ -46,7 +50,7 @@ class JsonWrappedObj(object):
         Converts this to a bare dict for JSON, applying mappings along the way.
         Only explicitly-defined props are unmapped.
         """
-        mapping = cls.mappings
+        mapping = cls.get_mappings()
 
         def map_out(mapper,v):
             if mapper is None: return v
@@ -71,7 +75,7 @@ class map_many(object):
         return [ self.inner.map(p,*args,**kargs) for p in ps ]
     
     def unmap(self,ps, *args, **kargs):
-        return [ self.inner.unmap(p, *ags, **kargs) for p in ps ]
+        return [ self.inner.unmap(p, *args, **kargs) for p in ps ]
 
 def props(cls, *simple,**specs):
     """\

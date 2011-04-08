@@ -39,7 +39,9 @@ def obj_to_railsparams(obj, key_prefix="", first=True):
     """
 
     # important to convert to a list, as it will be iter'ed over many times
-    return list(obj_to_railsparams_imp(obj, key_prefix, first, None))
+    fin_obj = strip_empty_vals(obj)
+    return list(obj_to_railsparams_imp(fin_obj, key_prefix, first, None))
+
 
 def obj_to_railsparams_imp(obj, key_prefix="", first=True, common_key = None):
     if (first):
@@ -77,6 +79,25 @@ def listlike(obj):
     return (not dictlike(obj) 
             and hasattr(obj, "__len__") 
             and hasattr(obj, "__iter__"))
+
+def strip_empty_vals(obj):
+    if (dictlike(obj)):
+        if (len(obj) == 0): return None
+        r = []
+        for (k,v) in obj.iteritems():
+            nv = strip_empty_vals(v)
+            if nv is not None: r.append( (k,nv) )            
+        return dict(r)
+
+    elif(listlike(obj)):
+        if (len(obj) == 0): return None
+        r = []
+        for v in obj:
+            nv = strip_empty_vals(v)
+            if nv is not None: r.append(nv)
+        return r
+    else:
+        return obj
 
 # Known limitations of the objs we can handle this way:
 #  a) no nested arrays. 

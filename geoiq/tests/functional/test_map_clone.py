@@ -15,6 +15,9 @@ class TestMapClone(GeoIQFuncTest):
         nmap = self.geoiq.maps.create()
         nmap.copy_from(gq_map)
         
+        for (k,v) in nmap.to_json_obj().iteritems():
+            print("MAP: %s - %s" % (k,repr(v)))
+
         nmap.save()
         final_map = self.geoiq.maps.get_by_id(nmap.geoiq_id)
         
