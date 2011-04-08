@@ -27,27 +27,30 @@ class Map(geoiq.GeoIQObj):
             fin[x] = p.get(x)
 
         # build the layers array
-        #  1) only included on create.
-        #  2) layer properties flattened out completely
-        #  NOTE: not sure about the encoding below...
-        #    arrays are with [] after the name, dict members with a keyword
-        #    in them?
 
         # curl -i -u "user:password" -d "layers[][source]=finder:92674" -d "title=Vehicles by Ward" -d "[layers][][styles][fill][classificationType]=St Deviation" -d "layers[][styles][fill][categories]=5" -d "layers[][styles][fill][colors][]=15725567" -d "layers[][styles][fill][colors][]=12441575" -d "layers[][styles][fill][colors][]=7057110" -d "layers[][styles][fill][colors][]=3244733" -d "layers[][styles][fill][colors][]=545180" -d "basemap=Google Terrain" -d "title=Abandoned Vehicle Requests by Ward DC" -d "layers[][styles][fill][selectedAttribute]=overdue request count" -d "layers[][styles][type]=CHOROPLETH"  -d "extent[]=-77" -d "extent[]=38" -d "extent[]=-76" -d "extent[]=39" -X POST http://geocommons.com/maps.json
 
-        l = p.get("layers",[])
-        for idx in range(len(l)):
-            for (k,v) in l[idx].iteritems():
-                nm = "layers[%d][%s]" % (idx,k)
-                if ("styles" == k):
-                    v = json.dumps(v) # TODO: Is this right?
-                fin[nm] = v
+        # Did the trick.
+        def undictify(key_prefix, result_accum, obj):
+            if (hasattr(obj, "iteritems")):
+                for (k,v) in obj.iteritems():
+                    undictify("%s[%s]" % (key_prefix, k), result_accum, v)
+            elif (hasattr(obj, "__len__") and hasattr(obj, "__iter__")):
+                for (i,v) in enumerate(obj):
+                    #undictify("%s[%d]" % (key_prefix, i), result_accum, v)
+                    undictify("%s[]" % (key_prefix), result_accum, v)
+            else:
+                result_accum.append((key_prefix, obj))
+        
+        layers_foo = []
+        undictify("layers", layers_foo, p.get("layers",[]))
+        fin.update(layers_foo)
 
         # flatten tags:
-        fin["tags"] = ",".join(p.get("tags",[]))
+        # fin["tags"] = ",".join(p.get("tags",[]))
 
         # Permissions... ??
-        fin["permissions"] = json.dumps(p.get("permissions",{}))
+        # fin["permissions"] = json.dumps(p.get("permissions",{}))
 
         return fin
         
