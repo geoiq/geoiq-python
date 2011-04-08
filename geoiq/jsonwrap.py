@@ -13,6 +13,13 @@ class JsonWrappedObj(object):
     def dirty(self):
         return self.isdirty
 
+    def copy_from(self, other):
+        """ Shallow copy writeable properties across from the other object """
+        for pname in other.__class__.mappings:
+            if  not self.mappings.get(pname,{}).get('ro',True):
+                if pname in other.props: self.props[pname] = other.props[pname]
+        return self
+
     @classmethod
     def map(cls,json, *args, **kwargs):
         """
@@ -23,7 +30,7 @@ class JsonWrappedObj(object):
         def id(x,*args, **kwargs): return x
 
         njson = dict(
-            (k,mapping.get('in_' + k, id)(*([v]+list(args)),**kwargs))
+            (k,mapping.get(k,{}).get('in', id)(v, *args,**kwargs))
             for (k,v) in json.iteritems()
             )
 
@@ -36,7 +43,7 @@ class JsonWrappedObj(object):
         mapping = self.__class__.mappings
         def id(x,*args,**kargs):return x
         return dict(
-            (k, mapping.get('out_' + k, id)(*([v] + list(args)), **kwargs))
+            (k, mapping.get(k,{}).get('out', id)(v, *args, **kwargs))
             for (k,v) in self.props.iteritems()
             )
 
@@ -87,14 +94,14 @@ def props(cls, *simple,**specs):
 
     for p in simple:
         doprop(p, ro_def, p)
-        
+        cls.mappings[p] = { "ro" : ro_def }
     for (nm,attrs) in specs.iteritems():
         doprop(nm, 
                ro_def or attrs.get('ro', False), 
                attrs.get('mapto', nm))
-
+        cls.mappings[nm] = { "ro" : ro_def or attrs.get('ro',False) }
         if "map_in" in attrs:
-            cls.mappings["in_" + nm] = attrs["map_in"]
+            cls.mappings[nm]["in"] = attrs["map_in"]
         if "map_out" in attrs:
-            cls.mappings["out_" + nm] = attrs["map_out"]
+            cls.mappings[nm]["out"] = attrs["map_out"]
 
