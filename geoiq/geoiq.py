@@ -102,7 +102,7 @@ class GeoIQSvc(object):
         try:
             v = u.urlopen(req)
         except u.HTTPError,e:
-            handled,res = self.handle_error(e)
+            handled,res = self.handle_error(e, req)
             if (handled): return (res,e)
             raise
 
@@ -153,11 +153,16 @@ class GeoIQSvc(object):
                                obj.to_json_obj())
         return obj
 
-    def handle_error(self, err):
+    def handle_error(self, err, req):
         # On 404, return null:
         if (err.code == 404): return (True, None)
 
         if (err.code == 401): raise GeoIQAccessDenied(err.read())
+        
+        if (err.code == 500):
+            print("500 Error in: %s" % req.get_full_url())
+            #print(err.read())
+            return (False,None)
 
         return (False,None)
 

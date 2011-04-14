@@ -98,6 +98,7 @@ RAWFILETYPES=[ [".shp",".dbf",".shx",".prj"],
                [".csv"],
                [".rss"],
                [".kmz"],
+               [".kml"],
                [".climgen"] ]
 OPTIONAL_TYPES=[ ".prj" ] # FIXME a bit of a hack
 
@@ -144,6 +145,27 @@ class Dataset(geoiq.GeoIQObj):
 
     def open_stream(self, format="zip"):
         return self.svc.open_stream(self, format)
+
+    def download(self, file_or_filename, format='kml'):
+        if format not in ["kml","csv","rss" ]:
+            raise ValueError("Unsupported format: " + format)
+        
+        if not hasattr(file_or_filename, "write"):
+            if (os.path.exists(file_or_filename)):
+                raise ValueError("File already exists: " + file_or_filename)
+            if not (os.path.exists(os.path.dirname(file_or_filename))):
+                raise ValueError("Directory missing: " + os.path.dirname(file_or_filename))
+            with open(file_or_filename, "wb") as outf:
+                return self.download(outf, format)
+
+        s = self.open_stream(format)
+        while True:
+            dat = s.read(4096)
+            if (dat == ""): break
+            file_or_filename.write(dat)
+        s.close()
+
+        return file_or_filename
 
     def download_shapefile(self, folder, work_folder=None):
         if not os.path.isdir(folder):

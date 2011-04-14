@@ -1,4 +1,4 @@
-import geoiq, unittest, os.path
+import geoiq, unittest, os.path, tempfile
 
 from geoiq.tests.functional import *
 from geoiq.tests.compare import *
@@ -6,9 +6,8 @@ from geoiq.util.protocol import obj_to_railsparams
 
 class TestDatasetClone(GeoIQFuncTest):
     def check_cloned_datasets(self, scratch, gc_ds, fin):
-        ndir = os.path.join(scratch, "as_uploaded")
-        os.mkdir(ndir)
-        fin.download_shapefile(ndir)
+        nf = os.path.join(scratch, "as_uploaded.kml")
+        fin.download(nf,'kml')
         
         dc = DeepCompare()
         ok,r = dc.compare(fin.props, gc_ds.props)
@@ -34,9 +33,13 @@ class TestDatasetClone(GeoIQFuncTest):
         
         scratch = self.working_folder()
 
-        fin,others = gc_ds.download_shapefile(scratch, work_folder=scratch)
+        temp = tempfile.NamedTemporaryFile(suffix=".kml", dir=scratch, delete=False)
         
-        cloned = self.geoiq.datasets.create(fin)
+        gc_ds.download(temp, "kml")
+        
+        temp.close()
+
+        cloned = self.geoiq.datasets.create(temp.name)
         cloned.copy_from(gc_ds)
 
         cloned.save()
