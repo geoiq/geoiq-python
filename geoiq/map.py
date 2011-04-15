@@ -5,9 +5,16 @@ except ImportError: import json
 class MapSvc(geoiq.GeoIQSvc):
     create_url = "maps.json"
     by_id_url = "maps/{id}.json"
+    layer_add_url = "maps/{id}/layers.json"
 
     def get_entity(self,json):
         return Map
+
+    def map_add_layer(self, m, lyr):
+        if (m.is_new()): raise ValueError("Can't add layers to an unsaved map.")
+        u = self.url(self.__class__.layer_add_url, id=m.geoiq_id)
+        ra,rb = self.raw_req(u, "POST", lyr.to_json_obj())
+        
 
 geoiq.GeoIQ.regsvc("maps", MapSvc)
 
@@ -61,6 +68,9 @@ class Layer(jsonwrap.JsonWrappedObj):
 
 jsonwrap.props(Layer,
                "title",
+               "type",
+               "visible",
+               "layer_id",
                "subtitle",
                "opacity",
                "styles",
@@ -70,17 +80,22 @@ jsonwrap.props(Layer,
 class Map(geoiq.GeoIQObj):
     writeable = True
     
-    # TODO: not using the create-layer endpoint .. is that ok?
-    def new_layer(self, source, position=None):
+    def add_layer(self, source):
         if self.layers is None: self.layers = []
         if not isinstance(source, LayerSource):
             source = LayerSource(source, self.geoiq)
 
         res = Layer({"source":source})
-        if position is not None: self.layers.insert(position, res)
-        else: self.layers.append(res)
-        return res
-    
+        
+        fin = self.svc.map_add_layer(self, res)
+        self.refresh()
+
+        for l in self.layers:
+            if (l.source.dataset_id == source.dataset_id):
+                return l
+        raise ValueError("Couldn't find the saved layer?")
+
+
 
 jsonwrap.props(Map, 
                "title",
@@ -90,5 +105,6 @@ jsonwrap.props(Map,
                "extent",
                "projection",
                "permissions", # TODO: map to permissions
-               layers={"map":jsonwrap.map_many(Layer)})
+               layers={"map":jsonwrap.map_many(Layer)},
+               contributor={"ro":True})
 

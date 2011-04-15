@@ -6,33 +6,51 @@ class SearchSvc(geoiq.GeoIQSvc):
     def get_entity(self,json):
         return SearchPage
 
+    def by_username(self, username, *args, **kargs):
+        return self.search("user:%s" % username, *args, **kargs)
+
     def search(self, request, model=None, bbox=None, max_results=None):
         per_page = 50
         page_limit = None
         if (max_results is not None):
             page_limit = (max_results / per_page) + 1
-        
+
         totcount = 0
+        done = False
+
         for page in self.search_raw(request, per_page=per_page,
                                  model=model,
                                  page_limit = page_limit,
                                  bbox = bbox):
-
+            
             for r in page.entries:
-                if max_results is not none and (totcount + 1 >= max_results):
+                if max_results is not None and (totcount  >= max_results):
+                    done=True
                     break
 
                 yield r
                 totcount += 1
 
+            if done:
+                break
+ 
+
+    def datasets(self, request, bbox=None, max_results=None):
+        return self.search(request, dataset.Dataset, bbox, max_results)
+
+    def maps(self, request, bbox=None, max_results=None):
+        return self.search(request, map.Map, bbox, max_results)
 
     def search_raw(self,request,
                start_page=0,
                per_page=50,
                model=None,
-               page_limit=float('inf'),
+               page_limit=None,
                bbox=None):
+        if page_limit is None: page_limit = float('inf')
         if model is not None:
+            if model == "map": model = map.Map
+            elif model == "dataset": model = dataset.Dataset
             def might_be(x, *xs):
                 for xx in xs:
                     try: 
@@ -102,7 +120,7 @@ class SearchPointer(jsonwrap.JsonWrappedObj):
         if self.is_dataset():
             loader = self.geoiq.datasets.get_by_id
         elif self.is_map():
-            loader = self.geoiq.maps.get_by_id,
+            loader = self.geoiq.maps.get_by_id
 
         if (loader is None):
             raise NotImplementedError("No implementation for: " + tp + "yet.")
@@ -129,5 +147,6 @@ class SearchPage(jsonwrap.JsonWrappedObj):
 jsonwrap.props(SearchPage,
                "totalResults",
                "itemsPerPage",
+               "next",
                entries={ "ro":True, 
                          "map": jsonwrap.map_many(SearchPointer) })

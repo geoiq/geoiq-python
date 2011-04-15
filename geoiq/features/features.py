@@ -1,4 +1,4 @@
-import geoiq.jsonwrap as jsonwrap
+import geoiq.util.jsonwrap as jsonwrap
 import struct, binascii
 
 def parse_geometry(geometry, factory):
@@ -68,9 +68,11 @@ class Feature(jsonwrap.JsonWrappedObj):
     def raw_parse(self, fact):
         return parse_geometry(self.geometry, fact)
 
-    def attributes(self):
-        r = dict( (p,v) for (p,v) in self.props.iteritems() if p != 'geometry')
-        return r
-
+    def _attributes(self):
+        if not hasattr(self, "_attrs"):
+            self._attrs = dict( (p,v) for (p,v) in self.props.iteritems() if p != 'geometry')
+        return self._attrs
+    attributes = property(_attributes)
+    
 jsonwrap.props(Feature,
                "geometry")

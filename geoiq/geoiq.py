@@ -105,6 +105,9 @@ class GeoIQSvc(object):
             handled,res = self.handle_error(e, req)
             if (handled): return (res,e)
             raise
+        except u.URLError,e:
+            print("Url error", req.get_full_url())
+            raise
 
         res = parser(v)
         fin = unwrapper(res)
@@ -158,6 +161,17 @@ class GeoIQSvc(object):
         if (err.code == 404): return (True, None)
 
         if (err.code == 401): raise GeoIQAccessDenied(err.read())
+
+        if (err.code == 400): 
+            print("Bad request.")
+            print("Request was:")
+            print(req.get_method() + ":" + req.get_full_url())
+            print(repr(req.get_data()))
+            print("========")
+            print(err.read())
+            print("========")
+            return (False, None)
+            
         
         if (err.code == 500):
             print("500 Error in: %s" % req.get_full_url())

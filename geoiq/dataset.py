@@ -10,6 +10,7 @@ class DatasetSvc(geoiq.GeoIQSvc):
     create_url = "datasets.json"
     update_feed_url = "datasets/{id}/fetch.json"
     features_url = "datasets/{id}/features.json?start={start}&limit={limit}&hex_geometry=1"
+    analyze_url = "datasets/{id}/calculate.json"
 
     def get_entity(self,json):
         return Dataset
@@ -26,6 +27,12 @@ class DatasetSvc(geoiq.GeoIQSvc):
         ds = Dataset(None, self)
         ds.set_upload(path_or_url)
         return ds
+
+    def analyze(self, ds, alg, inputs):
+        u = self.url(self.__class__.analyze_url, id=ds.geoiq_id)
+        parms = { "algorithm": alg, "input" : inputs }
+        fin,r = self.do_req(u, "POST", parms)
+        return fin
 
     def features(self, ds, start=0,limit = None, per_req=30):
         if limit is None:
@@ -147,7 +154,7 @@ class Dataset(geoiq.GeoIQObj):
         return self.svc.open_stream(self, format)
 
     def download(self, file_or_filename, format='kml'):
-        if format not in ["kml","csv","rss" ]:
+        if format not in ["kml","csv","rss","zip" ]:
             raise ValueError("Unsupported format: " + format)
         
         if not hasattr(file_or_filename, "write"):
@@ -181,13 +188,8 @@ class Dataset(geoiq.GeoIQObj):
 
         out_path = outfile.name
 
-        dl = self.open_stream("zip")
-        while True:
-            dat = dl.read(4096)
-            if (dat == ""):
-                break
-            outfile.write(dat)
-        dl.close()
+        self.download(outfile, format="zip")
+
         outfile.close()
         
         if not zipfile.is_zipfile(out_path):
@@ -207,6 +209,9 @@ class Dataset(geoiq.GeoIQObj):
         zipf.close()
 
         return (shp,nms)
+
+    def analyze(self, alg, inps):
+        return self.svc.analyze(self, alg, inps)
 
 jsonwrap.props(Dataset,
                "title",
