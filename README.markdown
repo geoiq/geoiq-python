@@ -4,15 +4,33 @@
 
 This is a python wrapper for the GeoIQ API. It allows Python developers to build unique and powerful domain specific applications. The API provides capability for uploading and download data, searching for data and maps, building, embedding, and theming maps or charts, as well as general user, group, and permissions management.
 
-!TOC
+1\.  [Installation](#installation)  
+1.1\.  [Using easy_install](#usingeasy_install)  
+1.2\.  [On windows](#onwindows)  
+1.3\.  [Optional functionality](#optionalfunctionality)  
+2\.  [Usage](#usage)  
+2.1\.  [Connecting to GeoIQ](#connectingtogeoiq)  
+2.2\.  [Searching for data and maps](#searchingfordataandmaps)  
+2.3\.  [Working with datasets](#workingwithdatasets)  
+2.3.1\.  [Accessing feature data](#accessingfeaturedata)  
+2.3.2\.  [Downloading a dataset](#downloadingadataset)  
+2.3.3\.  [Analyzing a dataset.](#analyzingadataset.)  
+2.4\.  [Working with maps](#workingwithmaps)  
+2.5\.  [Users and groups](#usersandgroups)  
 
-## Installation
+<a name="installation"></a>
 
-### Using easy_install
+## 1\. Installation
+
+<a name="usingeasy_install"></a>
+
+### 1.1\. Using easy_install
 
     easy_install geoiq
 
-### On windows
+<a name="onwindows"></a>
+
+### 1.2\. On windows
 
     TODO: needs testing/validation!
 
@@ -22,13 +40,19 @@ The easiest method is to use easy_install. If you don't have it already:
 
 * From the command prompt, run `C:\python2.5\scripts\easy_install.exe geoiq`
 
-### Optional functionality
+<a name="optionalfunctionality"></a>
+
+### 1.3\. Optional functionality
 
 If you want to use [Shapely](http://trac.gispython.org/lab/wiki/Shapely) with geoiq, make sure that Shapely is installed. On windows, use its installer (which includes DLLs that Shapely requires); on other platforms, you must ensure that `libgeos_c` is present.
 
-## Usage
+<a name="usage"></a>
 
-### Connecting to GeoIQ
+## 2\. Usage
+
+<a name="connectingtogeoiq"></a>
+
+### 2.1\. Connecting to GeoIQ
 
     import geoiq
 
@@ -41,7 +65,9 @@ If you want to use [Shapely](http://trac.gispython.org/lab/wiki/Shapely) with ge
     # Geocommons.com as a logged-in user:
     geocommons_loggedin = geoiq.GeoIQ("http://geocommons.com/", "username", "password")
     
-### Searching for data and maps
+<a name="searchingfordataandmaps"></a>
+
+### 2.2\. Searching for data and maps
 
 General searching:
 
@@ -68,7 +94,9 @@ Search by user:
     # alternatively:
     my_stuff = geocommons.current_user.library()
     
-### Working with datasets
+<a name="workingwithdatasets"></a>
+
+### 2.3\. Working with datasets
 
 You can fetch a dataset by ID or by searching. To get a dataset by ID:
 
@@ -104,7 +132,9 @@ You can also update properties on an existing dataset.
     ds.title = "Renamed dataset"
     ds.save()
 
-#### Accessing feature data
+<a name="accessingfeaturedata"></a>
+
+#### 2.3.1\. Accessing feature data
 
 You can pull out the features & attributes of a dataset:
 
@@ -123,7 +153,9 @@ You can pull out the features & attributes of a dataset:
 	arc_geometry_array = feature.to_arc() # TODO not yet implemented
 	
     
-#### Downloading a dataset
+<a name="downloadingadataset"></a>
+
+#### 2.3.2\. Downloading a dataset
 
 You can download a dataset in the format of your choice:
 
@@ -140,7 +172,9 @@ Supported formats are:
 * `rss`
 * `zip` -- a zipped shapefile
 
-#### Analyzing a dataset.
+<a name="analyzingadataset."></a>
+
+#### 2.3.3\. Analyzing a dataset.
 
      TODO: need documentation for analyses & params!!
 
@@ -149,7 +183,9 @@ To run a GeoIQ analytical operation:
      analysis_result_dataset = dataset.analylze("algorithm_name", { "param1":123 })
      
 
-### Working with maps
+<a name="workingwithmaps"></a>
+
+### 2.4\. Working with maps
 
 Getting a map:
 
@@ -171,7 +207,9 @@ Working with layer styles:
      # ... style editing ...
      new_map.save()
      
-### Users and groups
+<a name="usersandgroups"></a>
+
+### 2.5\. Users and groups
 
      user = geoiq.users.get_by_username("foo")
      
