@@ -74,13 +74,13 @@ General searching:
     search_results = geocommons.search("haiti", limit=30)
     for result in search_results:
         print(result.title)
-	print(result.description)
-	if (result.is_map()): # It's a map
-	    pass
-	if (result.is_dataset()): # It's a dataset
+        print(result.description)
+        if (result.is_map()): # It's a map
+            pass
+        if (result.is_dataset()): # It's a dataset
             pass
 	
-	the_map_or_dataset = result.load() # Load the result object
+        the_map_or_dataset = result.load() # Load the result object
 
 Searching for maps or datasets specifically:
 
@@ -143,14 +143,14 @@ You can pull out the features & attributes of a dataset:
         # Hex-encoded well-known binary
         raw_geometry = feature.geometry
 	
-	# Feature attributes:
-	name = feature.attributes["name"]
+        # Feature attributes:
+        name = feature.attributes["name"]
 	
-	# If you have shapely:
-	shapely_geometry = feature.to_shapely()
+        # If you have shapely:
+        shapely_geometry = feature.to_shapely()
 	
-	# If you're on windows with ArcGIS:
-	arc_geometry_array = feature.to_arc() # TODO not yet implemented
+        # If you're on windows with ArcGIS:
+        arc_geometry_array = feature.to_arc() # TODO not yet implemented
 	
     
 <a name="downloadingadataset"></a>
@@ -204,7 +204,7 @@ Working with layer styles:
 
      top = new_map.layers[0]
      top.styles["stroke"]["color"] = 0 # make it black
-     # ... style editing ...
+     # ... further style editing ...
      new_map.save()
      
 <a name="usersandgroups"></a>
@@ -215,7 +215,7 @@ Working with layer styles:
      
      group = geoiq.groups.get_by_id(1234)
      
-     # ... TODO, convenience wrapper for permissions: 
+     # ... TODO, convenience wrappers for membership & permissions: 
      #   group.add(user), group.remove(user),
      #   map_or_ds.permissions.view(user), # and .edit and .access
      #   map_or_ds.permissions.remove(user_or_group)
