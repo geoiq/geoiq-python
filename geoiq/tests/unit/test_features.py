@@ -49,7 +49,7 @@ class TestFeatures(ut.TestCase):
         self.assertEquals(s, shapely_check.wkb, "Shapely/geos bug?")
         
         f = features.Feature({"geometry":binascii.b2a_hex(s)})
-        ignored, nshape = f.to_shapely()
+        nshape = f.to_shapely()
 
         self.assertEquals(s, nshape.wkb, "WKB representation diverged?\n%s\n======\n%s\n" % (binascii.b2a_hex(s), binascii.b2a_hex(nshape.wkb)))
     

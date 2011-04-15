@@ -40,6 +40,6 @@ class Factory(object):
 shapely_factory = Factory()
 def to_shapely(self):
     global shapely_factory
-    return (self.attributes(), self.raw_parse(shapely_factory))
+    return self.raw_parse(shapely_factory)
 
 setattr(features.Feature, "to_shapely", to_shapely)
