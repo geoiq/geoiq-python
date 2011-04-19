@@ -109,10 +109,16 @@ RAWFILETYPES=[ [".shp",".dbf",".shx",".prj"],
                [".climgen"] ]
 OPTIONAL_TYPES=[ ".prj" ] # FIXME a bit of a hack
 
+try:
+    permutations_imp = itertools.permutations
+except AttributeError:
+    import util.backports
+    permutations_imp = util.backports.permutations
+
 class Dataset(geoiq.GeoIQObj):
     writeable = True
 
-    FILETYPES= dict( itertools.chain( * (( (x[0],x[1:]) for x in itertools.permutations(entry) ) for entry in RAWFILETYPES  )) )
+    FILETYPES= dict( itertools.chain( * (( (x[0],x[1:]) for x in permutations_imp(entry) ) for entry in RAWFILETYPES  )) )
 
     def set_upload(self, path):
         global OPTIONAL_TYPES
@@ -162,8 +168,8 @@ class Dataset(geoiq.GeoIQObj):
                 raise ValueError("File already exists: " + file_or_filename)
             if not (os.path.exists(os.path.dirname(file_or_filename))):
                 raise ValueError("Directory missing: " + os.path.dirname(file_or_filename))
-            with open(file_or_filename, "wb") as outf:
-                return self.download(outf, format)
+            outf = open(file_or_filename, "wb")
+            return self.download(outf, format)
 
         s = self.open_stream(format)
         while True:

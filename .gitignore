@@ -5,6 +5,7 @@ testconf.json
 geoiq.egg-info
 build
 dist
+*.egg
 
 # Temp/scratch
 scratch
