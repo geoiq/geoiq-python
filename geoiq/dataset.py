@@ -6,11 +6,11 @@ import itertools
 import features
 
 class DatasetSvc(geoiq.GeoIQSvc):
-    by_id_url = "datasets/{id}.json?include_features=0"
+    by_id_url = "datasets/%(id)s.json?include_features=0"
     create_url = "datasets.json"
-    update_feed_url = "datasets/{id}/fetch.json"
-    features_url = "datasets/{id}/features.json?start={start}&limit={limit}&hex_geometry=1"
-    analyze_url = "datasets/{id}/calculate.json"
+    update_feed_url = "datasets/%(id)s/fetch.json"
+    features_url = "datasets/%(id)s/features.json?start=%(start)s&limit=%(limit)s&hex_geometry=1"
+    analyze_url = "datasets/%(id)s/calculate.json"
 
     def get_entity(self,json):
         return Dataset
@@ -56,7 +56,7 @@ class DatasetSvc(geoiq.GeoIQSvc):
         if not format in supported:
             raise ValueError("Unsupported format; must be one of [%s]" % (",".join(supported)))
         
-        u = self.url("datasets/{id}.{format}", 
+        u = self.url("datasets/%(id)s.%(format)s", 
                      id=ds.geoiq_id,
                      format=format)
         fin, stream = self.raw_req(u, "GET", None)

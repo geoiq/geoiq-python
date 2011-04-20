@@ -84,7 +84,8 @@ class GeoIQSvc(object):
                 query = "?" + query
 
         if query is None: query = ""
-        return p.format(**urlencode_dictvals(kargs)) + query
+        d = dict(**urlencode_dictvals(kargs))
+        return (p % d) + query
 
     def obj_url(self, p, obj):
         return self.url(p, **obj.props)
@@ -102,9 +103,12 @@ class GeoIQSvc(object):
         try:
             v = u.urlopen(req)
         except u.HTTPError,e:
-            handled,res = self.handle_error(e, req)
-            if (handled): return (res,e)
-            raise
+            handled,res = self.handle_error(e, req, unwrapper, parser)
+            if (handled): 
+                return res
+            else:
+                print("Err %d:%s" % (e.code, req.get_full_url()))
+                raise
         except u.URLError,e:
             print("Url error", req.get_full_url())
             raise
@@ -144,6 +148,7 @@ class GeoIQSvc(object):
         fin,res = self.do_req(self.url(self.__class__.create_url),
                               "POST",
                               obj.to_json_obj())
+        print("here? %s" % (repr(fin)))
         obj.props = fin.props
         return obj
 
@@ -156,9 +161,15 @@ class GeoIQSvc(object):
                                obj.to_json_obj())
         return obj
 
-    def handle_error(self, err, req):
+    def handle_error(self, err, req, unwrapper, parser):
+        # Python 2.5 (windows): 20x is an error.
+        if (err.code >= 200 and err.code < 300):
+            res = parser(err)
+            fin = unwrapper(res)
+            return (True,(fin,res))
+
         # On 404, return null:
-        if (err.code == 404): return (True, None)
+        if (err.code == 404): return (True, (None,None))
 
         if (err.code == 401): raise GeoIQAccessDenied(err.read())
 

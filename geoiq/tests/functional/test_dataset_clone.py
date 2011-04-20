@@ -33,13 +33,12 @@ class TestDatasetClone(GeoIQFuncTest):
         
         scratch = self.working_folder()
 
-        temp = tempfile.NamedTemporaryFile(suffix=".kml", dir=scratch, delete=False)
+        dl = os.path.join(scratch, "downloaded.kml") #tempfile.NamedTemporaryFile(suffix=".kml", dir=scratch, delete=False)
         
-        gc_ds.download(temp, "kml")
+        gc_ds.download(dl, "kml")
         
-        temp.close()
-
-        cloned = self.geoiq.datasets.create(temp.name)
+        
+        cloned = self.geoiq.datasets.create(dl)
         cloned.copy_from(gc_ds)
 
         cloned.save()

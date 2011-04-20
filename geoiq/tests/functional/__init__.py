@@ -42,18 +42,18 @@ class GeoIQSteps(object):
         fail_count = 0
         count = 0
         while count < numwanted and fail_count < max_attempts:
-            r = random.randint(st,nd)
+            rid = random.randint(st,nd)
             try:
-                r = endpoint.get_by_id(r)
-                if r is not None and filt(r):
+                r = endpoint.get_by_id(rid)
+                if (r is not None) and filt(r):
                     yield r
                     count += 1
                 else: 
-                    print("filtered/404")
+                    print("filtered/404 %d, %r" % (rid,r))
                     fail_count += 1
             except geoiq.geoiq.GeoIQAccessDenied,err:
                 fail_count += 1
-                print("Access denied (%d) - %s" % (r, str(err)))
+                print("Access denied (%d) - %s" % (rid, str(err)))
 
 
 class GeoIQTestConf(object):
@@ -63,10 +63,11 @@ class GeoIQTestConf(object):
         if not os.path.exists(conf):
             conf = os.path.join(os.getcwd(),"bin", "testconf.json")
         if not os.path.exists(conf):
-            raise ArgumentError("Missing testconf.json!")
+            raise ValueError("Missing testconf.json!")
 
-        with open(conf) as c:
-            self.conf = json.load(c)
+        c = open(conf)
+        self.conf = json.load(c)
+        c.close()
 
         self.geoiq = geoiq.GeoIQ(self.conf["root"],
                                  self.conf["username"],

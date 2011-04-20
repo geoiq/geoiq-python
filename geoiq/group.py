@@ -2,7 +2,7 @@ import geoiq, util.jsonwrap
 
 class GroupSvc(geoiq.GeoIQSvc):
     create_url = "groups.json"
-    by_id_url = "groups/{id}.json"
+    by_id_url = "groups/$(id)s.json"
 
     def get_entity(self,json):
         return Group

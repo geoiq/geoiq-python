@@ -4,8 +4,8 @@ except ImportError: import json
 
 class MapSvc(geoiq.GeoIQSvc):
     create_url = "maps.json"
-    by_id_url = "maps/{id}.json"
-    layer_add_url = "maps/{id}/layers.json"
+    by_id_url = "maps/%(id)s.json"
+    layer_add_url = "maps/%(id)s/layers.json"
 
     def get_entity(self,json):
         return Map
