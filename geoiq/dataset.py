@@ -1,6 +1,7 @@
 
 import geoiq, util.jsonwrap as jsonwrap
-import urlparse, os.path, tempfile, zipfile
+import urlparse,cgi,urllib
+import  os.path, tempfile, zipfile
 import itertools
 
 import features
@@ -50,6 +51,22 @@ class DatasetSvc(geoiq.GeoIQSvc):
             for f in fin:
                 sofar+=1
                 yield f
+
+    def get_by_url(self, url):
+        up = urlparse.urlparse(url)
+        path = up.path
+        if not up.path.endswith(".json"):
+            path = up.path + ".json"
+        qq = cgi.parse_qs(up.query)
+        qq['include_features'] = 0
+        query = urllib.urlencode(qq)
+        fin_url = urlparse.urlunparse((up.scheme,
+                                      up.netloc,
+                                      path,
+                                      up.params,
+                                      query,
+                                      up.fragment))
+        return super(DatasetSvc,self).get_by_url(fin_url)
 
     def open_stream(self, ds, format="zip"):
         supported = ["zip","kml", "csv"]

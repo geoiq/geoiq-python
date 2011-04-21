@@ -132,6 +132,15 @@ class GeoIQSvc(object):
         fin = unwrapper(res)
         return fin,res
     
+    def get(self, v):
+        # Get by ID or URL.
+        try: id = int(v)
+        except ValueError:
+            return self.get_by_url(v)
+        
+        return self.get_by_id(id)
+
+
     def get_by_url(self, url):
         fin,res = self.do_req(self.url(url), "GET", None)
         # TODO: if 'url' doesn't share the same root as the service,
