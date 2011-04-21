@@ -1,5 +1,6 @@
 
 import urllib2 as u, poster.encode, poster.streaminghttp 
+import urlparse
 
 import base64, sys
 import util.jsonwrap as jsonwrap
@@ -30,7 +31,10 @@ def ident(x): return x
 
 class GeoIQEndpoint(object):
     def __init__(self, root, username, password):
+        if not root.endswith("/"):
+            root = root + "/"
         self.root = root
+        self.proot = urlparse.urlparse(root)
         self.username = username
         self.password = password
 
@@ -42,6 +46,15 @@ class GeoIQEndpoint(object):
         return req
 
     def resolve(self, path, verb, data=None):
+        # Check to see if the path is relative OR at the same host:
+        pp = urlparse.urlparse(path)
+        use_auth = True
+        if pp.hostname is not None:
+            if pp.hostname != self.proot.hostname:
+                use_auth = False
+        else:
+            path = self.root + path
+
         # Filter out nulls
         if (data is not None):
             data = obj_to_railsparams(data)
@@ -49,17 +62,19 @@ class GeoIQEndpoint(object):
         if (verb == "MULTIPART"): # use poster to do multipart form upload:
             assert(data is not None)
             datagen, headers = poster.encode.multipart_encode(data)
-            req = u.Request(self.root + path, datagen, headers)
-            return self.add_auth(req)
+            req = u.Request(path, datagen, headers)
+            if use_auth: return self.add_auth(req)
+            else: return req
 
         # if post data is key-value pairs:
         if (data is not None):
             data = urlencode_params(data)
 
-        req = u.Request(self.root + path, data)
+
+        req = u.Request(path, data)
         req.get_method = lambda: verb
-        return self.add_auth(req)
-    
+        if use_auth: return self.add_auth(req)
+        else: return req
 
 class GeoIQSvc(object):
     def __init__(self, geoiq, endpoint):
@@ -116,7 +131,14 @@ class GeoIQSvc(object):
         res = parser(v)
         fin = unwrapper(res)
         return fin,res
-
+    
+    def get_by_url(self, url):
+        fin,res = self.do_req(self.url(url), "GET", None)
+        # TODO: if 'url' doesn't share the same root as the service,
+        #   a) it can't be saved using this service.  b) can't be
+        #   linked/referenced by other objects using this svc (eg as a
+        #   layer in a map .)
+        return fin
 
     def get_by_id(self, geoiqid):
         fin, res = self.do_req(self.url(self.__class__.by_id_url,
