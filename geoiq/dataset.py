@@ -204,12 +204,11 @@ class Dataset(geoiq.GeoIQObj):
         if work_folder is not None and not os.path.isdir(work_folder):
             raise ValueError("Work folder must exist (if given)")
 
-        outfile = tempfile.NamedTemporaryFile(
-            suffix=".zip",
-            delete=False,
-            dir=work_folder)
+        if work_folder is None:
+            work_folder = tempfile.mkdtemp()
 
-        out_path = outfile.name
+        out_path = os.path.join(work_folder, "dl%d.zip" % self.geoiq_id)
+        outfile = open(out_path, "wb")
 
         self.download(outfile, format="zip")
 
@@ -219,7 +218,13 @@ class Dataset(geoiq.GeoIQObj):
             raise ValueError("Download failed or corruption?")
         
         zipf = zipfile.ZipFile(out_path)
-        zipf.extractall(folder)
+        try:
+            extractor = zipf.extractall
+        except AttributeError:
+            extractor = util.backports.zip_extract_all
+
+        extractor(zipf,folder)
+
         nms = [ os.path.abspath(os.path.join(folder,nm)) 
                 for nm in zipf.namelist() ]
         

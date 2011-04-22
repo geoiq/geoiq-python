@@ -1,5 +1,6 @@
 
 # Python 2.6 functions that're missing in 2.5:
+import os.path, os
 
 
 # http://docs.python.org/library/itertools.html#itertools.permutations
@@ -27,3 +28,15 @@ def permutations(iterable, r=None):
                 break
         else:
             return
+
+def zip_extract_all(zipfile, folder):
+    for name in zipfile.namelist():
+        out_path = os.path.join(folder, name)
+        out_dir = os.path.dirname(out_path)
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+        out_file = open(out_path, "wb")
+        out_file.write(zipfile.read(name))
+        out_file.close()
+
+        
