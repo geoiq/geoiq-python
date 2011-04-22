@@ -47,13 +47,13 @@ class GeoIQEndpoint(object):
 
     def resolve(self, path, verb, data=None):
         # Check to see if the path is relative OR at the same host:
-        pp = urlparse.urlparse(path)
-        use_auth = True
-        if pp.hostname is not None:
-            if pp.hostname != self.proot.hostname:
-                use_auth = False
+
+        if self.shares_endpoint(path):
+            use_auth = True
+            if self.is_relative(path):
+                path = self.root + path
         else:
-            path = self.root + path
+            use_auth = False
 
         # Filter out nulls
         if (data is not None):
@@ -75,6 +75,20 @@ class GeoIQEndpoint(object):
         req.get_method = lambda: verb
         if use_auth: return self.add_auth(req)
         else: return req
+
+    def is_relative(self,url):
+        pp = urlparse.urlparse(url)
+        return pp.hostname is None
+
+    def shares_endpoint(self, url):
+        pp = urlparse.urlparse(url)
+        if pp.hostname is not None:
+            if pp.hostname != self.proot.hostname:
+                return False
+            else:
+                return True
+        else:
+            return True
 
 class GeoIQSvc(object):
     def __init__(self, geoiq, endpoint):
@@ -142,12 +156,23 @@ class GeoIQSvc(object):
 
 
     def get_by_url(self, url):
-        fin,res = self.do_req(self.url(url), "GET", None)
-        # TODO: if 'url' doesn't share the same root as the service,
-        #   a) it can't be saved using this service.  b) can't be
-        #   linked/referenced by other objects using this svc (eg as a
-        #   layer in a map .)
-        return fin
+        if self.endpoint.shares_endpoint(url):
+            fin,res = self.do_req(self.url(url), "GET", None)
+            print("downloading %s" % url)
+            return fin
+        else:
+            up = urlparse.urlparse(url)
+            other_endpoint = GeoIQEndpoint(urlparse.urlunparse((up.scheme,
+                                                  up.netloc,
+                                                  "",
+                                                  "",
+                                                  "",
+                                                  "")), None, None)
+            other_geoiq = GeoIQ()
+            other_geoiq.endpoint = other_endpoint
+            other_svc = self.__class__(other_geoiq, other_endpoint)
+            return other_svc.get_by_url(url)
+
 
     def get_by_id(self, geoiqid):
         fin, res = self.do_req(self.url(self.__class__.by_id_url,
@@ -198,6 +223,8 @@ class GeoIQSvc(object):
             res = parser(err)
             fin = unwrapper(res)
             return (True,(fin,res))
+
+        #print("(err %d) on %s" % (err.code, req.get_full_url()))
 
         # On 404, return null:
         if (err.code == 404): return (True, (None,None))
