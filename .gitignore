@@ -1,6 +1,9 @@
 # Ignore the real testconf.json
 testconf.json
 
+# Ignore the arc demo's data folder:
+arc-geoprocessing-example/data
+
 # Python packaging artifacts:
 geoiq.egg-info
 build
