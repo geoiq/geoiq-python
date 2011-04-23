@@ -15,7 +15,6 @@
 # 
 # * Instructions/discussion specific to on preparing a network from an
 #   OSM shapefile extract (see answer #4):
-#
 #     http://forums.arcgis.com/threads/27196-Network-analysis-problem
 #
 
@@ -83,29 +82,6 @@ events_shape = events_ds.download_shapefile(work_folder)[0]
 # ============
 svclayer = "GeoIQ_Site_Areas"
 
-# Create the drive-time polygons (service area)
-# http://webhelp.esri.com/arcgiSDEsktop/9.2/index.cfm?TopicName=Make_Service_Area_Layer_%28Network_Analyst%29
-#gp.MakeServiceLayer_na(network_dataset,
-# gp.MakeServiceAreaLayer_na(network_dataset,
-#                            svclayer,
-#                            "Length"
-#                            "TRAVEL_TO",
-#                            breaks,
-#                            "SIMPLE_POLYGONS",
-#                            "NO_OVERLAP",
-#                            "DISKS",
-#                            "NO_LINES",
-#                            True,  # OVERLAP
-#                            False, #"NO_SPLIT",
-#                            "",    # Excluded sources
-#                            "",    # Accumulate attributes
-#                            "ALLOW_UTURNS",
-#                            "",    # Restrictions -- TODO: one-way?
-#                            False, #"TRIM_POLYS",
-#                            100, #"100 Meters",
-#                            False, #"NO_LINES_SOURCE_FIELDS"
-#                            )
-
 gp.MakeServiceAreaLayer_na(
     network_dataset, # in_network_dataset, 
     svclayer, # out_network_analysis_layer, 
@@ -126,30 +102,15 @@ gp.MakeServiceAreaLayer_na(
     "100 meters", # poly_trim_value, 
     False, #lines_source_fields
     )
+
 lg("Adding locations")
 
-# SCRATCH
-# =========
-locFieldMap = ("SourceID SourceId SID Source # <None>; " +
-               "PosAlong PosAlong PA Pos # 0; " +
-               "SourceOID SourceOID OID # -1; " +
-               "SideOfEdge SideOfEdge SOE # 'Left side'")
-
-rlocFieldMap = ("SourceID SourceId #; " +
-            "PosAlong PosAlong # 0; " +
-            "SourceOID SourceOID # -1; " +
-            "SideOfEdge SideOfEdge #;")
-
-locFieldMap = ("SourceID # '<None>'; " +
-               "PosAlong # 0; " +
-               "SourceOID # -1; " +
-               "SideOfEdge # 'Left side'")
-    
 gp.AddLocations_na(
     svclayer, # network_dataset, 
     "Facilities", 
-    "C:\\clients\\geoiq\\arc-geoprocessing-example\\outp\\evacuation_centers_from_japan_ushahidi.shp", #    os.path.abspath(sites_shape),
-    "#", #locFieldMap,# Field mappings
+    os.path.abspath(sites_shape),
+    #"C:\\clients\\geoiq\\arc-geoprocessing-example\\outp\\evacuation_centers_from_japan_ushahidi.shp", #  
+    "#", # Field mappings
     "100 meters", # search tolerance,
     "", # sort field,
     "", # custom snapping
@@ -158,37 +119,10 @@ gp.AddLocations_na(
     False, # snap facilities to roads?
     0)
 
-# Filter to only added locations; for some reason they're leading to errors?
-gp.Select_analysis(svclayer + "\\Facilities",
-                    work_folder + "\\filtered_locs.shp",
-                    "NOT (\"PosAlong\" = 1)")
-
-# Re-add only the OK locations:
-gp.addMessage("Filtering+replacing locations.")
-gp.AddLocations_na(
-    svclayer,
-    "Facilities",
-    work_folder + "\\filtered_locs.shp",
-    "",
-    "100 meters", 
-    "",
-    "",
-    True,
-    True,
-    False,
-    0)
-
-# DEBUG: copy locations for inf
-# Filter to only added locations; for some reason they're leading to errors?
-gp.Select_analysis(svclayer + "\\Facilities",
-                    work_folder + "\\dump_facilities.shp",
-                    "SourceOID IS NOT NULL")
-
 lg("Solving")
 gp.Solve_na(svclayer, True) # network_dataset, "SKIP")
 
 output_polygons = os.path.join(work_folder, "distance_polys.shp")
-
 
 # gp.SelectData_management(srclayer, "Polygons")
 spatialRef = gp.Describe(svclayer + "\\Facilities").SpatialReference
@@ -199,15 +133,31 @@ gp.CreateFeatureclass_management(work_folder,
                                  "SAME_AS_TEMPLATE",
                                  "SAME_AS_TEMPLATE",
                                  spatialRef)
-                                 #"DISABLED",
-                                 #"DISABLED",
-lg("Saving result")                                 
+
+lg("Saving result")
 gp.Append_management(svclayer + "\\Polygons",
                      output_polygons,
                      "NO_TEST")
 
 
 ds = gq.datasets.create(output_polygons)
-ds.title = upload_title #"Distances polygons." # TODO: get this as a parameter
+ds.title = upload_title 
 lg("Uploading result polygons")
 ds.save()
+
+if not ds.compat_endpoint(events_ds):
+    lg("Re-Uploading event points")
+    new_events = gq.datasets.create(events_shape)
+    new_events.copy_from(events_ds)
+    new_events.save()
+    events_ds = new_events
+
+# Analyze them:
+gq.analysis.load_all_analyses()
+fin = gq.analysis.analyze_intersect(ds1=events_ds.geoiq_id,
+                              ds2=ds.geoiq_id,
+                              merge='combine')
+
+# download final result
+finshp = fin.download_shapefile(work_folder)[0]
+

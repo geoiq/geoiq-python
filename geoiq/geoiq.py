@@ -297,4 +297,7 @@ class GeoIQObj(jsonwrap.JsonWrappedObj):
         self.svc = None
         return r
 
+    def compat_endpoint(self,other):
+        return self.svc.endpoint.shares_endpoint(other.svc.endpoint.root)
+
 jsonwrap.props(GeoIQObj,geoiq_id={'ro':True, 'mapto':'id'})
