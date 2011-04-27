@@ -119,10 +119,11 @@ def check_can_obj_to_railsparams(obj, parent_is_array = False):
         for v in obj: check_can_obj_to_railsparams(v, True)
     elif dictlike(obj):
         for (k,v) in obj.iteritems():
-            if (k.find("[") >= 0 or 
-                k.find("]") >= 0):
-                raise ValueError("System limitation: Brackets disallowed in"+
-                                 " keys")
+            # FIXME: TODO: 
+            # if (k.find("[") >= 0 or 
+            #     k.find("]") >= 0):
+            #     raise ValueError("System limitation: Brackets disallowed in"+
+            #                      " keys")
             check_can_obj_to_railsparams(v, False)
     else:
         # TODO: not sure the following is the right stuff to check:

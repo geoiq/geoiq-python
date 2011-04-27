@@ -1,4 +1,4 @@
-import geoiq, util.jsonwrap as jsonwrap, dataset, map
+import geoiq, util.jsonwrap as jsonwrap, dataset, map, analysis
 
 class SearchSvc(geoiq.GeoIQSvc):
     name="search"
@@ -51,6 +51,7 @@ class SearchSvc(geoiq.GeoIQSvc):
         if model is not None:
             if model == "map": model = map.Map
             elif model == "dataset": model = dataset.Dataset
+            elif model == "analysis": model= analysis.Analysis
             def might_be(x, *xs):
                 for xx in xs:
                     try: 
@@ -62,7 +63,12 @@ class SearchSvc(geoiq.GeoIQSvc):
                 model = "Overlay"
             elif (might_be(model, map, map.Map, map.MapSvc)):
                 model = "Map"
+            elif (might_be(model, analysis, analysis.Analysis, analysis.AnalysisSvc)):
+                model = "Refinement"
         
+        if "Refinement" == model and self.geoiq.endpoint.username is None:
+            raise ValueError("Search for analyses only works when logged in.")
+
         if bbox is not None:
             bbox = ",".join( ("%f" % x) for x in bbox )
 
@@ -114,6 +120,11 @@ class SearchPointer(jsonwrap.JsonWrappedObj):
             "Map" : True
             }.get(self.tp, False)
 
+    def is_analysis(self):
+        return {
+            "Refinement" : True
+            }.get(self.tp, False)
+
 
     def load(self):
         loader = None
@@ -121,6 +132,8 @@ class SearchPointer(jsonwrap.JsonWrappedObj):
             loader = self.geoiq.datasets.get_by_id
         elif self.is_map():
             loader = self.geoiq.maps.get_by_id
+        elif self.is_analysis():
+            loader = self.geoiq.analysis.get_by_id
 
         if (loader is None):
             raise NotImplementedError("No implementation for: " + tp + "yet.")

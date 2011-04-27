@@ -127,7 +127,7 @@ class GeoIQSvc(object):
         if unwrapper is None: unwrapper = self.unwrapper
         
         req = self.endpoint.resolve(path, verb, postdata)
-        
+
         # TODO tracing..
         try:
             v = u.urlopen(req)
@@ -204,7 +204,7 @@ class GeoIQSvc(object):
         fin,res = self.do_req(self.url(self.__class__.create_url),
                               "POST",
                               obj.to_json_obj())
-        print("here? %s" % (repr(fin)))
+
         obj.props = fin.props
         return obj
 
@@ -224,7 +224,7 @@ class GeoIQSvc(object):
             fin = unwrapper(res)
             return (True,(fin,res))
 
-        #print("(err %d) on %s" % (err.code, req.get_full_url()))
+
 
         # On 404, return null:
         if (err.code == 404): return (True, (None,None))
@@ -242,10 +242,11 @@ class GeoIQSvc(object):
             return (False, None)
             
         
-        if (err.code == 500):
-            print("500 Error in: %s" % req.get_full_url())
-            #print(err.read())
-            return (False,None)
+
+        print("(err %d) on %s w/ %s" % (err.code, req.get_full_url(), req.get_data()))
+        print("===")
+        print err.read()
+        print("===")
 
         return (False,None)
 
