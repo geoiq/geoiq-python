@@ -26,7 +26,7 @@ class AnalysisSvc(geoiq.GeoIQSvc):
             }
         
 
-        r,f = self.raw_req("analysis_go_url", "POST", args)
+        r,f = self.raw_req(self.getapi("analysis_go_url"), "POST", args)
 
         print("Finished!")
         tmplog = open("scratch/analysis.txt", "w")
@@ -82,7 +82,7 @@ class AnalysisSvc(geoiq.GeoIQSvc):
         res_method.__doc__ = a.instruction
         
         setattr(self, "analyze_" + a.algorithm, res_method)
-        self.algorithms.append((a.algorithm, res_method))
+        self.algorithms.append((a.algorithm, res_method, a))
 
     def load_all_analyses(self):
         a = self.geoiq.search("",model=Analysis)
@@ -94,8 +94,11 @@ class AnalysisSvc(geoiq.GeoIQSvc):
 
 geoiq.GeoIQ.regsvc("analysis", AnalysisSvc)
 
-class Analysis(jsonwrap.JsonWrappedObj):
-    pass
+class Analysis(geoiq.GeoIQObj):
+    @classmethod
+    def is_ro(cls): return True
+
+
 
 jsonwrap.props(Analysis, 
                "built_in", "algorithm","formula", "instruction", "parameters")

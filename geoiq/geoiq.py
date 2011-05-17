@@ -165,10 +165,14 @@ class GeoIQSvc(object):
             print("Url error", req.get_full_url())
             raise
 
-        res = parser(v)
-        fin = unwrapper(res)
-        return fin,res
-    
+        try:
+            res = parser(v)
+            fin = unwrapper(res)
+            return fin,res
+        except Exception:
+            sys.stderr.write("Exception during request: %s\n" % req.get_full_url())
+            raise
+            
     def get(self, v):
         # Get by ID or URL.
         try: id = int(v)

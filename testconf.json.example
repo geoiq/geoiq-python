@@ -1,5 +1,73 @@
 {
    "root" : "http://demo.geoiq.com/",
-   "username" : "ENTER USRNAME",
-   "password" : "ENTER PASSWORD"
+   "username" : "danshoutis",
+   "password" : "REDACTED",
+   "shapefile" : "/home/dan/proj/work/geoiq/geoiq-python/scratch/japan_earthquake_tweet_archive_sample.shp",
+   "kmlfile" :  "/home/dan/proj/work/geoiq/geoiq-python/scratch/dummy.kml",
+
+   "test_features" : [
+      { "id" : 20, 
+	"expected_count" : 3141,
+	"expected_title" : "Monthly US Unemployment Rates not seasonally adjusted, USA by County, January 2007 to January 2009"
+      }
+   ],
+   "test_analysis" : [
+      { "algorithm" : "analyze_intersect",
+	"ds1" : 1272,
+	"ds2" : 2343,
+	"merge" : "combine" }
+   ],
+
+   "suite" : {
+      "demo.geoiq.com (danshoutis)" : {
+	 "root" : "http://demo.geoiq.com/",
+	 "username" : "danshoutis",
+	 "password" : "REDACTED",
+	 "test_features" : [
+	    { "id" : 20, 
+	      "expected_count" : 3141,
+	      "expected_title" : "Monthly US Unemployment Rates not seasonally adjusted, USA by County, January 2007 to January 2009"
+	    }
+	 ],
+	 "test_analysis" : [
+	    { "algorithm" : "analyze_intersect",
+	      "ds1" : 1272,
+	      "ds2" : 2343,
+	      "merge" : "combine" }
+	 ]
+      },
+      "geocommons.com (shoutis)" : {
+	 "root" : "http://geocommons.com/",
+	 "username" : "shoutis",
+	 "password" : "REDACTED",
+	 "test_features" : [
+	    { "id" : 79438, 
+	      "expected_count" : 3219,
+	      "expected_title" : "Monthly US Unemployment Rates and Labor Force Data not seasonally adjusted, USA by County, September 2010"}
+	 ],
+	 "test_analysis" : [
+	    { "algorithm" : "analyze_intersect",
+	      "ds1" : 112700,
+	      "ds2" : 101578,
+	      "merge" : "combine" }
+	 ]
+      },
+      "staging.geocommons.net (shoutis)" : {
+	 "root" : "http://staging.geocommons.net/",
+	 "username" : "shoutis",
+	 "password" : "REDACTED",
+	 "apiver" : "StagingAPI",
+	 "test_features" : [ { "id" : 100107, 
+	      "expected_count" : 3220,
+	      "expected_title" : "Labor force data by county, not seasonally adjusted, March 2011 projected" } ],
+	 "test_analysis" : [
+	    { "algorithm" : "analyze_intersect",
+	      "ds1" : 4390,
+	      "ds2" : 99977,
+	      "merge" : "combine" }
+	 ]
+
+
+      }
+   }
 }

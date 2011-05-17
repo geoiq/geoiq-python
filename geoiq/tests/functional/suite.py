@@ -78,13 +78,14 @@ class FuncTestRunner:
 if (__name__ == '__main__'):
     # Import all tests here...
     from test_users import *
-    from test_dataset_clone import *
-    from test_map_clone import *
+    #from test_dataset_clone import *
+    #from test_map_clone import *
     from test_dataset import *
     from test_analysis import *
+    from test_search import *
 
     # http://mail.python.org/pipermail/tutor/2005-November/043069.html
-    # TODO: breaks multipart/form-encoded..
+    # TODO!: breaks multipart/form-encoded.....
     #import urllib2
     #h = urllib2.HTTPHandler(debuglevel=1)
     #opener = urllib2.build_opener(h)

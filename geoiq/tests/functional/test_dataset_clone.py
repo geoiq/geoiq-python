@@ -4,6 +4,7 @@ from geoiq.tests.functional import *
 from geoiq.tests.compare import *
 from geoiq.util.protocol import obj_to_railsparams
 import sys
+
 class TestDatasetClone(GeoIQFuncTest):
     def check_cloned_datasets(self, scratch, gc_ds, fin):
         nf = os.path.join(scratch, "as_uploaded.kml")
