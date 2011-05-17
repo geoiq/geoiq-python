@@ -57,7 +57,7 @@ class DeepCompare(object):
                 b_idx = j + l
         return (match, list(map_matches(results)))
 
-    def pprint(self,resmap, full_ok=True, outp=sys.stdout):
+    def pprint(self,resmap, outp, full_ok=True):
         def green(x):
             return ("\033[92m%s\033[0m" % x)
         def red(x):

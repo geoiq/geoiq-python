@@ -1,0 +1,52 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Func suite status</title>
+<script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'></script>
+<script type='text/javascript' src='viewsuite.js'></script>
+<script type='text/javascript' src='funcres.js'></script>
+<style type='text/css'>
+  body {
+    font-size : 0.75em ; 
+    font-family : "Verdana"
+  }
+  .testresults td {
+    border : 1px solid black ;
+    vertical-align : middle ;
+    margin : 0px ;
+    overflow : auto ;
+  }
+  tr.error, tr.failure {
+    border-color : 1px solid red ;
+    background-color : #FFCCCC;
+  }
+  p.stderr, p.stdout, p.exception {
+    white-space : pre ;
+    max-height : 6em ;
+    max-width : 20em ;
+    overflow : auto ;
+  }
+
+</style>
+</head>
+
+<body>
+<h1>Func suite status</h1>
+
+<table class="testresults">
+  <thead>
+    <tr>
+      <th>Test name</th>
+      <th>Site/login</th>
+      <th>Python version</th>
+      <th>Status</th>
+      <th>Traceback</th>
+      <th>Std err</th>
+      <th>Std out</th>
+    </tr>
+  </thead>
+  <tbody id="restab">
+  </tbody>
+</table>
+
+</body> </html>

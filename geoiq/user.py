@@ -25,7 +25,6 @@ class UserSvc(geoiq.GeoIQSvc):
         if self.geoiq.endpoint.username is None: return None
         # NOTE: on demo.geoiq.com you can't look up stuff about yourself?
 
-        print("Here..." + self.geoiq.endpoint.username)
         return self.get_by_id(self.geoiq.endpoint.username)
 
 geoiq.GeoIQ.regsvc("users", UserSvc)
@@ -62,15 +61,16 @@ class User(geoiq.GeoIQObj, UserStub):
     # Smuggle props into/out of the inner 'user' object:
     # --
     def to_json_obj(self):
-        return { "user": geoiq.GeoIQObj.to_json_obj(self) }
+        return { "User": geoiq.GeoIQObj.to_json_obj(self) }
 
     @classmethod
     def map(c,in_obj,*args,**kargs):
-        return super(User,c).map(c, in_obj["user"], *args, **kargs)
+        return super(User,c).map(in_obj["User"], *args, **kargs)
     # --
 
 util.jsonwrap.props(User,
                     "login",
+                    "id",
                     "email",
                     "fullname",
                     "password",

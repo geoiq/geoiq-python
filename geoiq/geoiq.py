@@ -5,6 +5,7 @@ import urlparse
 import base64, sys
 import util.jsonwrap as jsonwrap
 
+
 try: import simplejson as json
 except ImportError : import json
 
@@ -129,6 +130,7 @@ class GeoIQSvc(object):
         req = self.endpoint.resolve(path, verb, postdata)
 
         # TODO tracing..
+        
         try:
             v = u.urlopen(req)
         except u.HTTPError,e:
@@ -229,7 +231,9 @@ class GeoIQSvc(object):
         # On 404, return null:
         if (err.code == 404): return (True, (None,None))
 
-        if (err.code == 401): raise GeoIQAccessDenied(err.read())
+        if (err.code == 401): 
+            inf = "%s@%s ::" % (self.endpoint.username,req.get_full_url())
+            raise GeoIQAccessDenied(inf + err.read())
 
         if (err.code == 400): 
             print("Bad request.")

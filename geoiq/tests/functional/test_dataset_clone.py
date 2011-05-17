@@ -3,7 +3,7 @@ import geoiq, unittest, os.path, tempfile
 from geoiq.tests.functional import *
 from geoiq.tests.compare import *
 from geoiq.util.protocol import obj_to_railsparams
-
+import sys
 class TestDatasetClone(GeoIQFuncTest):
     def check_cloned_datasets(self, scratch, gc_ds, fin):
         nf = os.path.join(scratch, "as_uploaded.kml")
@@ -11,7 +11,7 @@ class TestDatasetClone(GeoIQFuncTest):
         
         dc = DeepCompare()
         ok,r = dc.compare(fin.props, gc_ds.props)
-        dc.pprint(r,False)
+        dc.pprint(r,sys.stdout,False)
 
         # ... features!
         orig_feats = list(p.props for p in gc_ds.features())
@@ -24,7 +24,7 @@ class TestDatasetClone(GeoIQFuncTest):
         if (diff_count > 0):
             report = os.path.join(scratch, "report.txt")
             repf = open(report,"w")
-            dc.pprint(feat_diff,False, repf)
+            dc.pprint(feat_diff,repf,False)
             repf.close()
             print("Report dumped")
     
@@ -40,6 +40,9 @@ class TestDatasetClone(GeoIQFuncTest):
         
         cloned = self.geoiq.datasets.create(dl)
         cloned.copy_from(gc_ds)
+
+
+        print(cloned.to_json_obj())
 
         cloned.save()
         

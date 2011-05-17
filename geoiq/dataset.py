@@ -219,7 +219,7 @@ class Dataset(geoiq.GeoIQObj):
         
         zipf = zipfile.ZipFile(out_path)
         try:
-            extractor = zipf.extractall
+            extractor = zipfile.ZipFile.extractall
         except AttributeError:
             extractor = util.backports.zip_extract_all
 

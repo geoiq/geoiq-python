@@ -15,7 +15,7 @@ class JsonWrappedObj(object):
     def copy_from(self, other):
         """ Shallow copy writeable properties across from the other object """
         for pname in other.__class__.mappings:
-            if  not self.mappings.get(pname,{}).get('ro',True):
+            if not self.mappings.get(pname,{}).get('ro',True):
                 if pname in other.props: self.props[pname] = other.props[pname]
         return self
 
@@ -111,7 +111,8 @@ def props(cls, *simple,**specs):
     ro_def = cls.is_readonly()
 
     # Make sure there's a class-level mapping dictionary:
-    setattr(cls, "mappings", getattr(cls,"mappings", {}))
+    omappings = dict(getattr(cls,"mappings", {}))
+    setattr(cls, "mappings", omappings)
 
     for p in simple:
         doprop(p, ro_def, p)

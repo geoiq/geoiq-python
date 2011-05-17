@@ -1,6 +1,6 @@
 #
 
-__all__ = [ "GeoIQFuncTest" ]
+__all__ = [ "GeoIQFuncTest", "GeoIQTestConf" ]
 
 import functesting
 import geoiq
@@ -57,6 +57,8 @@ class GeoIQSteps(object):
 
 
 class GeoIQTestConf(object):
+    suite_name = None
+
     def __init__(self):
         self.geocommons = geoiq.GeoIQ()
         conf = os.path.join(os.getcwd(), "testconf.json")
@@ -69,9 +71,15 @@ class GeoIQTestConf(object):
         self.conf = json.load(c)
         c.close()
 
-        self.geoiq = geoiq.GeoIQ(self.conf["root"],
-                                 self.conf["username"],
-                                 self.conf["password"])
+        if (GeoIQTestConf.suite_name is not None):
+            self.conf.update(self.conf["suite"][GeoIQTestConf.suite_name])
+
+        self.geoiq = geoiq.GeoIQ(self.conf.get("root"),
+                                 self.conf.get("username"),
+                                 self.conf.get("password"))
+    @classmethod
+    def use_suite(cls, nm):
+        cls.suite_name = nm
 
 
 class GeoIQFuncTest(functesting.FuncTest, GeoIQSteps):

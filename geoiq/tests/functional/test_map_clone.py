@@ -1,7 +1,7 @@
 import geoiq
 import unittest
 
-
+import sys
 from geoiq.tests.compare import DeepCompare
 from geoiq.tests.functional import *
 
@@ -23,7 +23,7 @@ class TestMapClone(GeoIQFuncTest):
         
         dc = DeepCompare()
         ok,r = dc.compare(final_map.props,gq_map.props)
-        dc.pprint(r)
+        dc.pprint(r,outp=sys.stdout)
 
 if (__name__ == "__main__"):
     unittest.main()
