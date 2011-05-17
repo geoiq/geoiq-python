@@ -11,6 +11,7 @@ except ImportError : import json
 
 from util.protocol import *
 
+import api
 
 poster.streaminghttp.register_openers()
 
@@ -18,8 +19,14 @@ class GeoIQ(object):
     def __init__(self, root="http://geocommons.com/",
                  username=None, 
                  password=None,
-                 api_version=1.0):
+                 apiver=None):
 
+        if apiver is None: apiver = api.API
+
+        if (isinstance(apiver,str)):
+            apiver = getattr(api, apiver)
+
+        self.api = apiver
         self.services = {}
         self.endpoint = GeoIQEndpoint(root,username,password)
 
@@ -96,6 +103,7 @@ class GeoIQEndpoint(object):
         else:
             return True
 
+dne = {} # identity object for non-passed params.
 class GeoIQSvc(object):
     def __init__(self, geoiq, endpoint):
         self.endpoint = endpoint
@@ -112,7 +120,15 @@ class GeoIQSvc(object):
     def unwrapper(self, r):
         return self.generate_entity(r)
 
-    def url(self,p,query=None,**kargs):
+    def getapi(self, key, default=dne):
+        if (default is dne):
+            return getattr(self.geoiq.api, key)
+        else:
+            return getattr(self.geoiq.api, key, default)
+
+    def url(self,pathname,query=None,**kargs):
+        p = self.getapi(pathname)
+
         if (query is not None):
             if (hasattr(query, '__getitem__')):
                 query = urlencode_params(query)

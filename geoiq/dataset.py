@@ -7,11 +7,8 @@ import itertools
 import features
 
 class DatasetSvc(geoiq.GeoIQSvc):
-    by_id_url = "datasets/%(id)s.json?include_features=0"
-    create_url = "datasets.json"
-    update_feed_url = "datasets/%(id)s/fetch.json"
-    features_url = "datasets/%(id)s/features.json?start=%(start)s&limit=%(limit)s&hex_geometry=1"
-    analyze_url = "datasets/%(id)s/calculate.json"
+    by_id_url = "dataset_by_id_url"
+    create_url = "dataset_create_url"
 
     def get_entity(self,json):
         return Dataset
@@ -29,12 +26,6 @@ class DatasetSvc(geoiq.GeoIQSvc):
         ds.set_upload(path_or_url)
         return ds
 
-    def analyze(self, ds, alg, inputs):
-        u = self.url(self.__class__.analyze_url, id=ds.geoiq_id)
-        parms = { "algorithm": alg, "input" : inputs }
-        fin,r = self.do_req(u, "POST", parms)
-        return fin
-
     def features(self, ds, start=0,limit = None, per_req=30):
         if limit is None:
             limit = ds.feature_count
@@ -46,7 +37,7 @@ class DatasetSvc(geoiq.GeoIQSvc):
             if (sofar + per_req) >= limit:
                 per_req = limit - sofar
 
-            u = self.url(self.__class__.features_url, start=sofar, limit=per_req, id=ds.geoiq_id)
+            u = self.url("dataset_features_url", start=sofar, limit=per_req, id=ds.geoiq_id)
             fin,res = self.do_req(u, "GET", None, unwrapper=gen)
             for f in fin:
                 sofar+=1
@@ -73,14 +64,14 @@ class DatasetSvc(geoiq.GeoIQSvc):
         if not format in supported:
             raise ValueError("Unsupported format; must be one of [%s]" % (",".join(supported)))
         
-        u = self.url("datasets/%(id)s.%(format)s", 
+        u = self.url("dataset_download_url",
                      id=ds.geoiq_id,
                      format=format)
         fin, stream = self.raw_req(u, "GET", None)
         return stream
 
     def request_feed_update(self, ds):
-        u = self.url(update_feed_url, **ds.to_json_obj())
+        u = self.url("dataset_update_feed_url", **ds.to_json_obj())
         r,_ = self.do_req(u, "GET", None, lambda x : x)
         return r
 
@@ -96,7 +87,7 @@ class DatasetSvc(geoiq.GeoIQSvc):
             post["dataset"] = dict( (k, open(v,'rb')) for (k,v) in dataset.uploads.iteritems() )
             method = "MULTIPART"
 
-        r,f = self.raw_req(DatasetSvc.create_url, method, post)
+        r,f = self.raw_req(self.getapi("dataset_create_url"), method, post)
 
         fin_loc = r.info()["location"]
 

@@ -3,16 +3,15 @@ try: import simplejson as json
 except ImportError: import json
 
 class MapSvc(geoiq.GeoIQSvc):
-    create_url = "maps.json"
-    by_id_url = "maps/%(id)s.json"
-    layer_add_url = "maps/%(id)s/layers.json"
+    by_id_url = "map_by_id_url"
+    create_url = "map_create_url"
 
     def get_entity(self,json):
         return Map
 
     def map_add_layer(self, m, lyr):
         if (m.is_new()): raise ValueError("Can't add layers to an unsaved map.")
-        u = self.url(self.__class__.layer_add_url, id=m.geoiq_id)
+        u = self.url("map_layer_add_url", id=m.geoiq_id)
         ra,rb = self.raw_req(u, "POST", lyr.to_json_obj())
         
 

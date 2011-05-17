@@ -2,9 +2,7 @@ import geoiq, util.jsonwrap as jsonwrap
 import urlparse
 
 class AnalysisSvc(geoiq.GeoIQSvc):
-    #refine_url = "refiners"
-    refine_url = "analysis.json" # TODO: should it always be there?
-    by_id_url = "refinements/%(id)s.json"
+    by_id_url = "analysis_by_id_url"
 
     def __init__(self,*args, **kargs):
         self.algorithms = []
@@ -28,7 +26,7 @@ class AnalysisSvc(geoiq.GeoIQSvc):
             }
         
 
-        r,f = self.raw_req(AnalysisSvc.refine_url, "POST", args)
+        r,f = self.raw_req("analysis_go_url", "POST", args)
 
         print("Finished!")
         tmplog = open("scratch/analysis.txt", "w")
@@ -87,9 +85,10 @@ class AnalysisSvc(geoiq.GeoIQSvc):
         self.algorithms.append((a.algorithm, res_method))
 
     def load_all_analyses(self):
-        a = [ r.load() for r in self.geoiq.search("",model=Analysis) ]
-        for res in a:
-            assert(res.is_analysis()) # (Permissions?) we sometimes get datasets and maps back.
+        a = self.geoiq.search("",model=Analysis)
+        for searchres in a:
+            assert(searchres.is_analysis()), ("Searching for analysis returned results of type %s instead." % searchres.tp)  # (Permissions?) we sometimes get datasets and maps back.
+            res = searchres.load()
             if res.built_in and (res.formula is None):
                 self.add_analysis_algorithm(res)
 

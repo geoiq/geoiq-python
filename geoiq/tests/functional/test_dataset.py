@@ -1,4 +1,4 @@
-import geoiq, os.path
+import geoiq
 import unittest
 from geoiq.tests.functional import *
 

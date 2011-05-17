@@ -76,7 +76,8 @@ class GeoIQTestConf(object):
 
         self.geoiq = geoiq.GeoIQ(self.conf.get("root"),
                                  self.conf.get("username"),
-                                 self.conf.get("password"))
+                                 self.conf.get("password"),
+                                 self.conf.get("apiver"))
     @classmethod
     def use_suite(cls, nm):
         cls.suite_name = nm

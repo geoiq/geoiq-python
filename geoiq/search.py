@@ -60,13 +60,13 @@ class SearchSvc(geoiq.GeoIQSvc):
                 return False
 
             if (might_be(model, dataset, dataset.Dataset, dataset.DatasetSvc)):
-                model = "Overlay"
+                model = self.getapi("search_dataset_name")
             elif (might_be(model, map, map.Map, map.MapSvc)):
-                model = "Map"
+                model = self.getapi("search_map_name")
             elif (might_be(model, analysis, analysis.Analysis, analysis.AnalysisSvc)):
-                model = "Refinement"
+                model = self.getapi("search_analysis_name")
         
-        if "Refinement" == model and self.geoiq.endpoint.username is None:
+        if self.getapi("search_analysis_name") == model and self.geoiq.endpoint.username is None:
             raise ValueError("Search for analyses only works when logged in.")
 
         if bbox is not None:
@@ -85,7 +85,7 @@ class SearchSvc(geoiq.GeoIQSvc):
                 'bbox' : bbox
                 }
 
-            u = self.url("search.json", query=o)
+            u = self.url("search", query=o)
             print("Search url:" + u)
             fin,res = self.do_req(u, "GET", None)
             c += fin.itemsPerPage
@@ -110,21 +110,13 @@ class SearchPointer(jsonwrap.JsonWrappedObj):
 
     # TODO: what kind is it?
     def is_dataset(self):
-        return {
-            "Dataset" : True,
-            "Overlay" : True,
-            }.get(self.tp, False)
+        return self.tp == self.svc.getapi("search_dataset_name")
 
     def is_map(self):
-        return {
-            "Map" : True
-            }.get(self.tp, False)
+        return self.tp == self.svc.getapi("search_map_name")
 
     def is_analysis(self):
-        return {
-            "Refinement" : True
-            }.get(self.tp, False)
-
+        return self.tp == self.svc.getapi("search_analysis_name")
 
     def load(self):
         loader = None

@@ -1,8 +1,8 @@
 import geoiq, util.jsonwrap
 
 class UserSvc(geoiq.GeoIQSvc):
-    create_url = "users.json"
-    by_id_url = "users/%(id)s.json"
+    create_url = "user_create_url"
+    by_id_url = "user_by_id_url"
 
     def get_entity(self,json):
         return User
