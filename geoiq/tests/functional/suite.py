@@ -81,6 +81,7 @@ if (__name__ == '__main__'):
     from test_dataset_clone import *
     from test_map_clone import *
     from test_dataset import *
+    from test_analysis import *
 
     # http://mail.python.org/pipermail/tutor/2005-November/043069.html
     # TODO: breaks multipart/form-encoded..

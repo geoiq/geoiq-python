@@ -2,8 +2,13 @@ import geoiq, util.jsonwrap as jsonwrap
 import urlparse
 
 class AnalysisSvc(geoiq.GeoIQSvc):
-    refine_url = "refiners"
+    #refine_url = "refiners"
+    refine_url = "analysis.json" # TODO: should it always be there?
     by_id_url = "refinements/%(id)s.json"
+
+    def __init__(self,*args, **kargs):
+        self.algorithms = []
+        geoiq.GeoIQSvc.__init__(self,*args,**kargs)
 
     def update(self, *args):
         raise ValueError("Read-only for now.")
@@ -25,6 +30,12 @@ class AnalysisSvc(geoiq.GeoIQSvc):
 
         r,f = self.raw_req(AnalysisSvc.refine_url, "POST", args)
 
+        print("Finished!")
+        tmplog = open("scratch/analysis.txt", "w")
+        tmplog.write(r.read())
+        tmplog.close()
+
+
         # Success =  redirect!
         fin_loc = r.geturl()
 
@@ -34,11 +45,12 @@ class AnalysisSvc(geoiq.GeoIQSvc):
         return self.geoiq.datasets.get_by_id(fin_id)
 
     def add_analysis_algorithm(self, a):
+        
         # Wrap a parsed analysis description into something that boils
         #  into a call to .analyze()
         assert(a.built_in and a.formula is None), "Can only add builtin algorithms"
 
-        assert(not hasattr(self, "analyze_" + a.algorithm)),"already have this algorithm defined"
+        assert(not hasattr(self, "analyze_" + a.algorithm)),("already have %s algorithm defined" % a.algorithm)
 
         def dotype(t,v):
             if isinstance(v, str):
@@ -65,18 +77,19 @@ class AnalysisSvc(geoiq.GeoIQSvc):
         
         parsers = [ pp(param) for param in a.parameters ]
 
-        def res_method(self, **kargs):
+        def res_method(**kargs):
             args = dict(p(kargs) for p in parsers)
             return self.analyze(a.algorithm, args)
 
         res_method.__doc__ = a.instruction
         
-        setattr(self.__class__, "analyze_" + a.algorithm, res_method)
-                
+        setattr(self, "analyze_" + a.algorithm, res_method)
+        self.algorithms.append((a.algorithm, res_method))
 
     def load_all_analyses(self):
         a = [ r.load() for r in self.geoiq.search("",model=Analysis) ]
         for res in a:
+            assert(res.is_analysis()) # (Permissions?) we sometimes get datasets and maps back.
             if res.built_in and (res.formula is None):
                 self.add_analysis_algorithm(res)
 

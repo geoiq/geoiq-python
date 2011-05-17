@@ -16,15 +16,20 @@ poster.streaminghttp.register_openers()
 
 class GeoIQ(object):
     def __init__(self, root="http://geocommons.com/",
-                 username=None, password=None):
+                 username=None, 
+                 password=None,
+                 api_version=1.0):
 
+        self.services = {}
         self.endpoint = GeoIQEndpoint(root,username,password)
 
 
     @classmethod
     def regsvc(cls, nm, svc):
         def getter(self):
-            return svc(self, self.endpoint)
+            if nm not in self.services:
+                self.services[nm] = svc(self, self.endpoint)
+            return self.services[nm]
 
         setattr(cls, nm, property(getter))
 
