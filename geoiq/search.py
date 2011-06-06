@@ -86,7 +86,6 @@ class SearchSvc(geoiq.GeoIQSvc):
                 }
 
             u = self.url("search", query=o)
-            print("Search url:" + u)
             fin,res = self.do_req(u, "GET", None)
             c += fin.itemsPerPage
             curpage += 1
