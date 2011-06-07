@@ -17,12 +17,16 @@
 	"ds2" : 2343,
 	"merge" : "combine" }
    ],
-
+   "test_upload_then_intersect": {
+      "polys" : "/home/dan/proj/work/geoiq/geoiq-python/travel_distance_polygons_from_osm_hospitals.shp",
+      "points" : "/home/dan/proj/work/geoiq/geoiq-python/japan_feed.shp"
+   },
    "suite" : {
       "demo.geoiq.com (danshoutis)" : {
 	 "root" : "http://demo.geoiq.com/",
 	 "username" : "danshoutis",
 	 "password" : "REDACTED",
+	 "apiver" : "StagingAPI",
 	 "test_features" : [
 	    { "id" : 20, 
 	      "expected_count" : 3141,
@@ -34,12 +38,17 @@
 	      "ds1" : 1272,
 	      "ds2" : 2343,
 	      "merge" : "combine" }
-	 ]
+	 ],
+	 "test_upload_then_intersect": {
+	    "polys" : "/home/dan/proj/work/geoiq/geoiq-python/scratch/travel_distance_polygons_from_osm_hospitals.shp",
+	    "points" : "/home/dan/proj/work/geoiq/geoiq-python/scratch/japan_feed.shp"
+	 }
       },
       "geocommons.com (shoutis)" : {
 	 "root" : "http://geocommons.com/",
 	 "username" : "shoutis",
 	 "password" : "REDACTED",
+	 "apiver" : "StagingAPI",
 	 "test_features" : [
 	    { "id" : 79438, 
 	      "expected_count" : 3219,
@@ -50,7 +59,11 @@
 	      "ds1" : 112700,
 	      "ds2" : 101578,
 	      "merge" : "combine" }
-	 ]
+	 ],
+	 "test_upload_then_intersect": {
+	    "polys" : "/home/dan/proj/work/geoiq/geoiq-python/scratch/travel_distance_polygons_from_osm_hospitals.shp",
+	    "points" : "/home/dan/proj/work/geoiq/geoiq-python/scratch/japan_feed.shp"
+	 }
       },
       "staging.geocommons.net (shoutis)" : {
 	 "root" : "http://staging.geocommons.net/",
@@ -65,9 +78,11 @@
 	      "ds1" : 4390,
 	      "ds2" : 99977,
 	      "merge" : "combine" }
-	 ]
-
-
+	 ],
+	 "test_upload_then_intersect": {
+	    "polys" : "/home/dan/proj/work/geoiq/geoiq-python/scratch/travel_distance_polygons_from_osm_hospitals.shp",
+	    "points" : "/home/dan/proj/work/geoiq/geoiq-python/scratch/japan_feed.shp"
+	 }
       }
    }
 }
