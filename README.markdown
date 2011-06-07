@@ -197,7 +197,7 @@ Working with layer styles:
      new_map.save()
      
 
-<a name="analysis></a>
+<a name="analysis"></a>
 #### 2.5\. Analysis
 
      TODO: need documentation for analyses & params!!
