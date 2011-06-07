@@ -153,7 +153,7 @@ class GeoIQSvc(object):
         # TODO tracing..
         
         try:
-            v = u.urlopen(req)
+            v = u.urlopen(req,timeout=30)
         except u.HTTPError,e:
             handled,res = self.handle_error(e, req, unwrapper, parser)
             if (handled): 
