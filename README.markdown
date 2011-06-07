@@ -14,8 +14,8 @@ This is a python wrapper for the GeoIQ API. It allows Python developers to build
 2.3\.  [Working with datasets](#workingwithdatasets)  
 2.3.1\.  [Accessing feature data](#accessingfeaturedata)  
 2.3.2\.  [Downloading a dataset](#downloadingadataset)  
-2.3.3\.  [Analyzing a dataset.](#analyzingadataset.)  
 2.4\.  [Working with maps](#workingwithmaps)  
+2.5\.  [Analysis](#analysis)  
 2.5\.  [Users and groups](#usersandgroups)  
 
 <a name="installation"></a>
@@ -38,7 +38,7 @@ The easiest method is to use easy_install. If you don't have it already:
 
 * Download and run the windows .exe installer for setuptools for your version of python from: http://pypi.python.org/pypi/setuptools
 
-* From the command prompt, run `C:\python2.5\scripts\easy_install.exe geoiq`
+* From the command prompt, run `C:\python2.5\scripts\easy_install.exe geoiq`, with `C:\python2.5\` replaced by your python installation location if needed.
 
 <a name="optionalfunctionality"></a>
 
@@ -172,19 +172,8 @@ Supported formats are:
 * `rss`
 * `zip` -- a zipped shapefile
 
-<a name="analyzingadataset."></a>
-
-#### 2.3.3\. Analyzing a dataset.
-
-     TODO: need documentation for analyses & params!!
-
-To run a GeoIQ analytical operation:
-
-     analysis_result_dataset = dataset.analylze("algorithm_name", { "param1":123 })
-     
 
 <a name="workingwithmaps"></a>
-
 ### 2.4\. Working with maps
 
 Getting a map:
@@ -207,9 +196,27 @@ Working with layer styles:
      # ... further style editing ...
      new_map.save()
      
+
+<a name="analysis></a>
+#### 2.5\. Analysis
+
+     TODO: need documentation for analyses & params!!
+
+To run a GeoIQ analytical operation, first load available analyses:
+
+     geoiq.analysis.load_all_analyses()
+     
+Then, use the analysis of your choice:
+
+     analysis_result_dataset = geoiq.analysis.analyze_intersect(ds1=a, ds2=b)
+     
+
+
+
+
 <a name="usersandgroups"></a>
 
-### 2.5\. Users and groups
+### 2.6\. Users and groups
 
      user = geoiq.users.get_by_username("foo")
      
