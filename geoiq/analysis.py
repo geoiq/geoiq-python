@@ -24,6 +24,15 @@ class AnalysisSvc(geoiq.GeoIQSvc):
                     }
                 }
             }
+
+        # TODO: this may be the way to use the analysis.json instead?
+        #  (the [refiner] args mimic the web UI's arguments)
+        #
+
+        #flatargs = {
+        #    "algorithm" : algorithm
+        #    }
+        #flatargs.update(inputs)
         
 
         r,f = self.raw_req(self.getapi("analysis_go_url"), "POST", args)
@@ -38,8 +47,10 @@ class AnalysisSvc(geoiq.GeoIQSvc):
         fin_loc = r.geturl()
 
         assert(fin_loc is not None), "Didn't get a location back from the server"
+
         fin_id = urlparse.urlparse(fin_loc).path.split("/")[-2]
-        
+        assert(fin_id is not None and fin_id != ""), "Couldn't parse an ID out from the analysis result."
+
         return self.geoiq.datasets.get_by_id(fin_id)
 
     def add_analysis_algorithm(self, a):
