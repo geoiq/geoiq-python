@@ -2,7 +2,10 @@
 <html>
 <head>
 <title>Func suite status</title>
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/themes/base/jquery-ui.css" type="text/css" media="all"></link>
+
 <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js'></script>
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.13/jquery-ui.min.js'></script>
 <script type='text/javascript' src='viewsuite.js'></script>
 <script type='text/javascript' src='funcres.js'></script>
 <style type='text/css'>
@@ -27,6 +30,26 @@
     overflow : auto ;
   }
 
+  table.wire {
+    width : 100% !important ;
+  }
+
+  table.wire td {
+    border-bottom : 1px solid black ;
+    cursor : pointer ;
+    white-space : pre !important ;
+  }
+
+  table.wire td.wr { text-align : left; }
+  table.wire td.rd { text-align : right ; }
+  table.wire td:hover {
+    color : blue ;
+  }
+
+  .ui-dialog {
+    width : 90% !important
+  }
+
 </style>
 </head>
 
@@ -43,8 +66,7 @@
       <th>Traceback</th>
       <th>Std err</th>
       <th>Std out</th>
-      <th>Written</th>
-      <th>Read</th>
+      <th>Wire</th>
     </tr>
   </thead>
   <tbody id="restab">

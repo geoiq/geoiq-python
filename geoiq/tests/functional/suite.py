@@ -7,7 +7,8 @@ try:
 except ImportError:
     import json
 import urllib
-most_recent_socket = None
+
+recent_sockets = []
 
 class FuncTestResult(ut.TestResult):
     def __init__(self):
@@ -21,6 +22,8 @@ class FuncTestResult(ut.TestResult):
 
     def startTest(self, test):
         global rout
+        global recent_sockets
+
         self.old_stdout = sys.stdout
         self.old_stderr = sys.stderr
         rout.write("/* Starting %s */\n" % str(test))
@@ -34,22 +37,28 @@ class FuncTestResult(ut.TestResult):
         self.curtest["pyver"] = sys.version
         self.curtest["module"] = test.__module__
 
+        recent_sockets = []
+
         return ut.TestResult.startTest(self,test)
     
     def stopTest(self, test):
-        global most_recent_socket
+        global recent_sockets
         self.curtest["stdout"] = sys.stdout.getvalue()
         self.curtest["stderr"] = sys.stderr.getvalue()
         self.curtest["stoptime"] = time.time()
         sz = 1024 * 16
-        if most_recent_socket is not None:
-            self.curtest["last_written"] = urllib.quote(
-                most_recent_socket._send_log.getvalue()[:sz]
-                )
-            self.curtest["last_read"] = urllib.quote(
-                most_recent_socket._recv_log.getvalue()[:sz]
-                )
+        if len(recent_sockets) > 0 :
+            
+            self.curtest["last_written"] = [ 
+                urllib.quote(s._send_log.getvalue()[:sz] ) 
+                for s in recent_sockets 
+                ]
 
+            self.curtest["last_read"] = [ 
+                urllib.quote(s._recv_log.getvalue()[:sz] ) 
+                for s in recent_sockets 
+                ]
+                
         self.all_tests.append(self.curtest)
         self.curtest = None
 
@@ -113,10 +122,10 @@ class proxyit(object):
 
 class logged_socket(object):
     def __init__(self):
-        global most_recent_socket
+        global recent_sockets
         self._send_log = StringIO.StringIO()
         self._recv_log = StringIO.StringIO()
-        most_recent_socket = self
+        recent_sockets.append(self)
 
     def set_inner(self, i, p): 
         self.socket = i

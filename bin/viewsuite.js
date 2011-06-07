@@ -20,20 +20,59 @@ window.testResults = function(r) {
 	       rv.text("(none)");
 	    else
 	       rv.click(function() {
-		  var t = !!unesc ? unescape(v[nm]) : v[nm];
-		  alert(t);
+		  var val = v[nm];
+		  if ($.isArray(val)) {
+		     $.each(val, function(idx,vv) {
+			var t = !!unesc ? unescape(vv) : vv;
+			alert(t);
+		     });
+		  } else {
+		     var t = !!unesc ? unescape(v[nm]) : v[nm];
+		     alert(t);
+		  }
 	       });
 	 };
+
+	 
 
 	 rv("test");
 	 rv("suite");
 	 rv("pyver");
 	 rv("status");
-	 rv("exception");
+	 pupv("exception");
 	 pupv("stderr");
 	 pupv("stdout");
-	 pupv("last_written", true);
-	 pupv("last_read", true);
+	 $("<td>(click)</td>").appendTo(r).click(function() {
+	    var writes = v["last_written"];
+	    var reads = v["last_read"];
+	    console.log("here",writes, reads);
+	    var tab = $("<table class='wire'></table>");
+	    for (var i =0; i < writes.length; i++) {
+	       (function(wr,rd) {
+		  var row = $("<tr></tr>").appendTo(tab);
+		  var fst_w = wr.split("\n").slice(0,1).join("\n");
+		  var fst_r = rd.split("\n").slice(0,1).join("\n");
+		  console.log("huh", fst_w, fst_r, $("<td></td>").text(fst_w));
+		  row.append(
+		     $("<td class='wr'></td>")
+			.text(fst_w)
+			.click(
+			   function() { alert(wr); } 
+			) 
+		  );
+		  row.append(
+		     $("<td class='rd'></td>")
+			.text(fst_r)
+			.click(
+			   function() { alert(rd); } 
+			) 
+		  );
+	       })(unescape(writes[i]), unescape(reads[i]));
+	    }
+	    tab.dialog();
+	 });
+	 //pupv("last_written", true);
+	 //pupv("last_read", true);
       });
    });
 };
