@@ -3,6 +3,7 @@ import geoiq, util.jsonwrap as jsonwrap
 import urlparse,cgi,urllib
 import  os.path, tempfile, zipfile
 import itertools
+import time
 
 import features
 
@@ -229,6 +230,21 @@ class Dataset(geoiq.GeoIQObj):
 
         return (shp,nms)
 
+    def wait_until_complete(self, max_wait=200):
+        wait = 1.0 # exponential backoff...
+        start = time.time()
+        while (self.state != "complete"):
+            dur = time.time() - start
+            #dummy = self.geoiq.datasets.get_by_id(self.geoiq_id)
+            print("Waiting on state: %s (%f,%r)" % (self.state,dur,self.geoiq_id))
+            if (dur > max_wait):
+                return False
+            wait = (wait * 1.25) # exponential backoff
+            time.sleep(wait)
+            self.refresh()
+        print("FIN", self.state)
+        return True
+
     def analyze(self, alg, inps):
         return self.svc.analyze(self, alg, inps)
 
@@ -241,6 +257,7 @@ jsonwrap.props(Dataset,
                "feature_count",
                "author",
                "source",
+               state={"ro":True},
                link={"ro":True},
                contributor={"ro":True},
                published={"ro":True})

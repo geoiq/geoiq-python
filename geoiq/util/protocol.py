@@ -136,9 +136,9 @@ def check_can_obj_to_railsparams(obj, parent_is_array = False):
             # Otherwise, make sure it has a "nice" str rep:
             elif ((not hasattr(obj, "__str__"))
                 or (obj.__str__.__objclass__ is object) ):
-                    raise ValueError("%s is not a simple value, or cannot be" +
+                    raise ValueError(("%s is not a simple value, or cannot be" +
                                      " converted into one via str(). Consider"+
-                                     " implementing __str__?" % (str(obj)))
+                                     " implementing __str__?") % (str(obj)))
 
 # Find a key that's common to all dicts, skipping non-dicts and empty dicts.
 def get_common_dict_key(dicts):

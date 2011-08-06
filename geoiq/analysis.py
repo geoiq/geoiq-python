@@ -39,14 +39,21 @@ class AnalysisSvc(geoiq.GeoIQSvc):
         assert(not hasattr(self, "analyze_" + a.algorithm)),("already have %s algorithm defined" % a.algorithm)
 
         def dotype(t,v):
-            if isinstance(v, str):
-                # type names: .. "attribute", "dataset", "boundary", 
-                # TODO: collect all known type names
-                pass
-            if hasattr(v, "__len__"):
+            if isinstance(t, str):
+                # type names: .. "attribute", "dataset","dataset_input", "boundary", 
+                # TODO: collect all known type names? 
+                if (hasattr(v, 'state')):
+                    if (v.state != 'complete'):
+                        # TODO: once the API returns correct state values:
+                        # raise ValueError("Can't analyize an incomplete dataset.")
+                        return v.geoiq_id
+                    else:
+                        return v.geoiq_id
+
+            if hasattr(t, "__len__"):
                 # array -- 'tis like an enum.
                 pass
-            elif hasattr(v,"__getitem__"):
+            elif hasattr(t,"__getitem__"):
                 # dict
                 pass
             return v
